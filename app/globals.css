@@ -1071,7 +1071,8 @@ a.nota-num:hover { text-decoration: underline; }
 .buscador h3:focus-visible { outline: 2px solid var(--granate); outline-offset: 4px; }
 .tabla-productos .origen { display: block; font-family: var(--font-datos); font-variation-settings: "wdth" 80; font-size: 13px; color: var(--tinta-64); }
 .tabla-productos .boton { white-space: nowrap; }
-.fila:has(> .texto details:not([open])) > .notas { display: none; }
+.fila:not(.aviso-partido):has(> .texto details:not([open])) > .notas { display: none; }
+.aviso-partido:has(> .texto details:not([open])) .notas-porque { display: none; }
 .campo .opcion { display: flex; gap: 12px; align-items: center; font-weight: 400; margin-bottom: 0; }
 .opcion input { accent-color: var(--tinta); width: 20px; height: 20px; flex: none; }
 .relleno-tinta { padding-block: 80px; }
@@ -1272,7 +1273,8 @@ html.js-notas .sin-js-solo { display: none; }
   cursor: pointer;
   transition: transform var(--mov-toque-soltar) var(--curva-suave);
 }
-.po-objetivo:hover, .po-objetivo:focus-visible, .po-objetivo:has(input:focus-visible) { box-shadow: inset 0 0 0 0.5px var(--tinta); border-width: 2px; }
+/* R4-C4: el borde no cambia de grosor; el realce es una sombra interior estática que suma 0,5 px (2 px en total). */
+.po-objetivo:hover, .po-objetivo:focus-visible, .po-objetivo:has(input:focus-visible) { box-shadow: inset 0 0 0 0.5px var(--tinta); }
 .po-objetivo:active { transform: scale(var(--mov-toque-escala)); transition-duration: var(--mov-toque); }
 .po-objetivo:has(input:focus-visible) { outline: 2px solid var(--granate); outline-offset: 3px; }
 .po-objetivo[data-elegido] { background: var(--tinta); color: var(--papel); }
@@ -1443,7 +1445,8 @@ html.js-notas .sin-js-solo { display: none; }
 .guias-linea { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 20px; }
 @media (min-width: 900px) { .guias-linea { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--medianil); } }
 .firma-metodo { margin-top: 56px; padding-block: 20px 32px; border-top: 1px solid rgb(28 26 23 / 0.3); }
-.portada-v3 + .campo-tinta, .portada-v3 ~ .reticula #guias { margin-top: 96px; }
+.portada-v3 ~ .reticula #guias { margin-top: 96px; }
+.portada-v3 + .campo-tinta { margin-top: 64px; }
 
 /* ───────── Listas por objetivo ───────── */
 .carril-lista { display: block; margin-top: 32px; }
@@ -1677,3 +1680,48 @@ a.cl-fila:hover > span:first-child, a.cl-fila:focus-visible > span:first-child {
   .franja-sello { margin-top: 40px; }
 }
 @media (min-width: 1200px) { .te-resumen { pointer-events: none; color: var(--tinta-64); text-decoration: none; } }
+
+/* ───────── Ronda 5: retoques de movimiento (R4-C1 a R4-C7) y de la crítica v4 ───────── */
+/* R4-C5: la cifra no mueve el texto de su fila */
+.cl-fila { align-items: center; }
+.cl-n { line-height: 1; }
+/* R4-C7: las dos cifras apiladas en la misma celda; cambian en seco con «Vegano» y la fila no cambia de ancho */
+.cl-n-doble { display: inline-grid; justify-items: end; }
+.cl-n-doble > span { grid-area: 1 / 1; }
+.cl-n-vegano { visibility: hidden; }
+html[data-c~="vegano"] .cl-n-todas { visibility: hidden; }
+html[data-c~="vegano"] .cl-n-vegano { visibility: visible; }
+
+/* R4-C3: la línea de «Tu elección» nunca crece. En el escritorio no lista lo marcado (las casillas ya se ven); en el móvil,
+   una sola línea con «y N más» y el resto recortado. */
+.te-linea { flex-wrap: nowrap; white-space: nowrap; }
+.te-objetivo { flex: none; }
+.te-resumen { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+@media (min-width: 1200px) {
+  .te-resumen, .te-sep-resumen {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* R4-C6: el aviso a la vista, en un hueco de dos líneas reservado desde el principio */
+.te-aviso { min-height: 2.8em; margin-top: 8px; font-family: var(--font-datos); font-variation-settings: "wdth" 85; font-size: 14px; line-height: 1.4; }
+
+/* R4-C4: en el móvil, el pie de la casilla reserva su alto para que «Elegido» no cambie la fila */
+@media (max-width: 899.98px) { .objetivo-pie { height: 18px; min-height: 18px; align-items: center; line-height: 18px; } }
+
+/* Crítica v4, 1: sin hueco bajo la cabecera de las listas en el escritorio */
+@media (min-width: 1200px) {
+  .lista .cuadro-lista .cl-fila { min-height: 34px; padding-block: 6px; }
+  .lista .cuadro-lista .cl-titulo { font-size: 20px; }
+  .lista .cuerpo > .seccion:first-child { margin-top: 40px; }
+}
+
+/* Crítica v4, 5: el foco del buscador en tinta, nunca en granate */
+.bt-campo input:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
+
+/* Crítica v4, 4: el aviso de seguridad de «Lo que no necesitas», en su bloque */
+.no-necesitas .aviso-fila { margin-top: 10px; }

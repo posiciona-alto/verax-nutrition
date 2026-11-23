@@ -1,6 +1,18 @@
 import type { ReactNode } from "react";
 
-export type FilaCuadro = { id: string; texto: string; n?: number | string; href?: string };
+/** `nVegano`: la cifra cuando «Vegano» quita algo de la sección; las dos van en el HTML, apiladas, y cambian en seco (R4-C7). */
+export type FilaCuadro = { id: string; texto: string; n?: number | string; nVegano?: number; href?: string };
+
+function Cifra({ f }: { f: FilaCuadro }) {
+  if (f.n === undefined) return null;
+  if (f.nVegano === undefined || f.nVegano === f.n) return <span className="cl-n">{f.n}</span>;
+  return (
+    <span className="cl-n cl-n-doble">
+      <span className="cl-n-todas">{f.n}</span>
+      <span className="cl-n-vegano">{f.nVegano}</span>
+    </span>
+  );
+}
 
 /**
  * «Esta lista, por dentro»: la contraetiqueta de B aplicada a una lista (crítica v3, puntos 1 y 2).
@@ -33,12 +45,12 @@ export function CuadroLista({
             {f.href ? (
               <a href={f.href} className="cl-fila">
                 <span>{f.texto}</span>
-                {f.n !== undefined ? <span className="cl-n">{f.n}</span> : null}
+                <Cifra f={f} />
               </a>
             ) : (
               <span className="cl-fila">
                 <span>{f.texto}</span>
-                {f.n !== undefined ? <span className="cl-n">{f.n}</span> : null}
+                <Cifra f={f} />
               </span>
             )}
           </li>

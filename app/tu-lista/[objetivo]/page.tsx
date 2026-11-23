@@ -156,6 +156,40 @@ function frasesEnFila(notas: Notas, frases: FraseLista[], opciones: { antes?: Re
   );
 }
 
+/** El aviso de seguridad de una entrada de «Lo que no necesitas», en su bloque y con «Por qué» plegado (crítica v4, punto 4). */
+function avisoAparte(notas: Notas, aviso: { visible: FraseLista; porque?: FraseLista }) {
+  const visible = prepara(notas, [aviso.visible]);
+  const porque = aviso.porque ? prepara(notas, [aviso.porque]) : null;
+  return (
+    <Fila
+      salud
+      className="aviso-fila aviso-partido"
+      texto={
+        <div className="aviso-salud">
+          <div className="aviso-visible">{visible.parrafos}</div>
+          {porque ? (
+            <details className="porque">
+              <summary>
+                <span className="abrir">Por qué</span>
+                <span className="cerrar">Ocultar</span>
+              </summary>
+              {porque.parrafos}
+            </details>
+          ) : null}
+        </div>
+      }
+      notas={
+        visible.margen || porque?.margen ? (
+          <>
+            {visible.margen}
+            {porque?.margen ? <div className="notas-porque">{porque.margen}</div> : null}
+          </>
+        ) : undefined
+      }
+    />
+  );
+}
+
 function MarcaBorrador({ texto = "Dosier en borrador, no se publica" }: { texto?: string }) {
   return <span className="marca-sin-dosier">{texto}</span>;
 }
@@ -308,6 +342,7 @@ export default async function PaginaLista({ params }: Props) {
                       ),
                       despues: certeza ? <p className="nn-certeza">{certeza}</p> : null,
                     })}
+                    {x.aviso ? avisoAparte(notas, x.aviso) : null}
                     {x.ficha ? (
                       <p className="enlace-ficha">
                         <Link href={x.ficha}>Qué dicen los estudios&nbsp;→</Link>
@@ -432,7 +467,13 @@ export default async function PaginaLista({ params }: Props) {
         )
       }
       filas={[
-        ...secciones.map((s) => ({ id: s.id, texto: s.titulo, n: cuenta[s.id], href: `#${s.id}` })),
+        ...secciones.map((s) => ({
+          id: s.id,
+          texto: s.titulo,
+          n: cuenta[s.id],
+          nVegano: s.id === "suplementos" ? bloques.tarjetas.filter((t) => t.id !== "whey").length : undefined,
+          href: `#${s.id}`,
+        })),
         { id: "en-que-se-basa", texto: "En qué se basa", href: "#en-que-se-basa" },
       ]}
       fuentes={{ total: cuadro.fuentes.total, con: cuadro.fuentes.con, sinDato: MODO_CONCEPTO ? cuadro.fuentes.sinDato : 0, sostiene }}

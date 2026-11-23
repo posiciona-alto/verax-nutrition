@@ -22,6 +22,7 @@ export function TuEleccion({
   const [marcadas, setMarcadas] = useState<Circunstancia[]>([]);
   const [anuncio, setAnuncio] = useState("");
   const [abierta, setAbierta] = useState(false);
+  const [aviso, setAviso] = useState("");
   const id = useId();
 
   useEffect(() => {
@@ -30,21 +31,57 @@ export function TuEleccion({
   }, [circunstancias]);
 
   const cambiar = (id: Circunstancia) => {
-    const nuevas = marcadas.includes(id) ? marcadas.filter((x) => x !== id) : [...marcadas, id];
+    const marcar = !marcadas.includes(id);
+    const nuevas = marcar ? [...marcadas, id] : marcadas.filter((x) => x !== id);
     const orden = circunstancias.map((c) => c.id).filter((c) => nuevas.includes(c));
-    setMarcadas(orden);
+
+    /* Lo que puede aparecer o irse con una circunstancia, sin contar las líneas del propio carril (R4-C1). */
+    const piezas = [...document.querySelectorAll<HTMLElement>(".lista .cuerpo .circ, .lista .cuerpo [class*='quita-']")];
+    const antes = piezas.map((el) => el.getClientRects().length > 0);
+
+    /* «Ancla del lector» (movimiento 2.3, R4-C2): en el escritorio el carril va fijo y lo que cambia puede estar por encima
+       de lo que se lee; la primera línea a la vista se queda en su sitio, en el mismo fotograma y sin animar. */
+    const ancla =
+      window.matchMedia("(min-width: 1200px)").matches && window.scrollY > 0
+        ? [...document.querySelectorAll<HTMLElement>(".lista .cuerpo :is(h2, h3, p, li)")].find((el) => {
+            if (el.closest(".circ, [class*='quita-']")) return false;
+            return el.getBoundingClientRect().top >= 0;
+          })
+        : undefined;
+    const arriba = ancla?.getBoundingClientRect().top;
+
     document.documentElement.dataset.c = orden.join(" ");
+    if (ancla && arriba !== undefined) {
+      const diferencia = ancla.getBoundingClientRect().top - arriba;
+      if (Math.abs(diferencia) >= 1) window.scrollBy(0, diferencia);
+    }
+
+    setMarcadas(orden);
     window.history.replaceState(null, "", `${window.location.pathname}${orden.length ? `#${orden.join(",")}` : ""}`);
-    const cambios = document.querySelectorAll(`.lista [data-circ~="${id}"], .lista .quita-${id}`).length;
-    setAnuncio(`La lista ha cambiado: ${cambios} ${cambios === 1 ? "cosa" : "cosas"}.`);
+
+    const cambios = piezas.filter((el, i) => (el.getClientRects().length > 0) !== antes[i]).length;
+    const nombreC = circunstancias.find((c) => c.id === id)?.texto ?? "";
+    const texto =
+      cambios === 0
+        ? `${nombreC} ${marcar ? "marcado" : "desmarcado"}: la lista no cambia.`
+        : !marcar && orden.length === 0
+          ? `${nombreC} desmarcado: la lista vuelve a como estaba.`
+          : `${nombreC} ${marcar ? "marcado" : "desmarcado"}: ${cambios} ${cambios === 1 ? "cambio" : "cambios"} en la lista.`;
+    setAviso(texto);
+    /* Si coincide con el anterior, se vacía y se rellena en el fotograma siguiente para que se vuelva a decir. */
+    if (texto === anuncio) {
+      setAnuncio("");
+      requestAnimationFrame(() => setAnuncio(texto));
+    } else setAnuncio(texto);
   };
 
   const volver = `/#${[slug, ...marcadas].join(",")}`;
-  const resumen = marcadas.length
-    ? circunstancias
-        .filter((c) => marcadas.includes(c.id))
-        .map((c) => c.texto)
-        .join(", ")
+  const nombres = circunstancias.filter((c) => marcadas.includes(c.id)).map((c) => c.texto);
+  /* En el móvil, un nombre y «y N más», en una sola línea (R4-C3). */
+  const resumen = nombres.length
+    ? nombres.length > 1
+      ? `${nombres[0]} y ${nombres.length - 1} más`
+      : nombres[0]
     : "Nada marcado";
 
   return (
@@ -54,7 +91,7 @@ export function TuEleccion({
       </h2>
       <p className="te-linea">
         <strong className="te-objetivo">{nombre}</strong>
-        <span aria-hidden="true"> · </span>
+        <span aria-hidden="true" className="te-sep-resumen"> · </span>
         <button
           type="button"
           className="te-resumen solo-js"
@@ -62,8 +99,8 @@ export function TuEleccion({
           aria-controls={`${id}-circ`}
           onClick={() => setAbierta((a) => !a)}
         >
-          <span className="sr-only">Lo que has marcado: </span>
-          {resumen}
+          <span aria-hidden="true">{resumen}</span>
+          <span className="sr-only">Lo que has marcado: {nombres.length ? nombres.join(", ") : "nada"}</span>
         </button>
         <span aria-hidden="true" className="solo-js"> · </span>
         <a href={volver}>Cambiar</a>
@@ -80,6 +117,8 @@ export function TuEleccion({
             </li>
           ))}
         </ul>
+        {/* R4-C6, resuelta con el criterio de la revisión: la misma frase del aviso, a la vista, en un hueco reservado y sin aria-live. */}
+        <p className="te-aviso">{aviso}</p>
         <p className="po-privacidad">Lo que marques se queda en tu navegador: no lo guardamos ni nos llega.</p>
       </fieldset>
       {children}

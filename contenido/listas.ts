@@ -47,6 +47,8 @@ export type LineaNoNecesitas = {
   frase: FraseLista;
   ficha?: string;
   estado?: Estado;
+  /** El aviso de seguridad, aparte de lo que dicen los estudios (crítica v4, punto 4): una frase a la vista y el resto en «Por qué». */
+  aviso?: { visible: FraseLista; porque?: FraseLista };
 };
 
 export type Calculadora = { titulo: string; texto: string; href?: string; pendiente?: string };
@@ -254,22 +256,30 @@ const G14: FraseLista = {
 const PG_DOSIER = "perder grasa (v2, sin aprobar)";
 const pg = (codigo: string, texto: string, fuentes: FuenteLibre[]): FraseLista => ({ tipo: "libre", codigo, dosier: PG_DOSIER, texto, fuentes });
 const PG = {
-  pg2: pg(
-    "PG-2",
-    "Extracto de té verde: parece que no hace lo que promete, y es bastante probable. Además, la EFSA vio que con 800 mg o más al día de su sustancia principal (EGCG) en complemento suben las enzimas del hígado, y no pudo fijar una dosis segura para los complementos. Por eso en la UE cada toma diaria tiene que llevar menos de esa cantidad y la etiqueta debe avisar de que no lo tomen embarazadas, mujeres que dan el pecho ni menores de 18 años, de que no se tome en ayunas y de que no se sume a otros productos con té verde. El té verde en infusión no entra en esta restricción y se considera en general seguro.",
-    [
-      { cita: "Jurgens 2012", pmid: "23235664", vinculo: "en-dosier" },
-      { cita: "Maunder 2020", pmid: "31984610", vinculo: "en-dosier" },
-      { cita: "EFSA 2018", vinculo: "organismo" },
-      { cita: "Reg. (CE) 1925/2006, anexo III, parte B", vinculo: "norma" },
-    ],
+  /* Las frases PG-2, PG-3 y PG-6 van partidas por sus puntos, sin cambiar una palabra: lo que dicen los estudios y, aparte,
+     el aviso de seguridad (crítica v4, punto 4). Cada parte lleva sus propias fuentes. */
+  pg2: pg("PG-2", "Extracto de té verde: parece que no hace lo que promete, y es bastante probable.", [
+    { cita: "Jurgens 2012", pmid: "23235664", vinculo: "en-dosier" },
+    { cita: "Maunder 2020", pmid: "31984610", vinculo: "en-dosier" },
+  ]),
+  pg2Aviso: pg(
+    "PG-2, seguridad",
+    "Además, la EFSA vio que con 800 mg o más al día de su sustancia principal (EGCG) en complemento suben las enzimas del hígado, y no pudo fijar una dosis segura para los complementos.",
+    [{ cita: "EFSA 2018", vinculo: "organismo" }],
   ),
-  pg3: pg(
-    "PG-3",
-    "Garcinia: parece que no hace lo que promete, pero faltan estudios. Hay casos raros, pero documentados, de daño en el hígado en personas que la tomaban, sola o mezclada con té verde.",
+  pg2Porque: pg(
+    "PG-2, norma",
+    "Por eso en la UE cada toma diaria tiene que llevar menos de esa cantidad y la etiqueta debe avisar de que no lo tomen embarazadas, mujeres que dan el pecho ni menores de 18 años, de que no se tome en ayunas y de que no se sume a otros productos con té verde. El té verde en infusión no entra en esta restricción y se considera en general seguro.",
+    [{ cita: "Reg. (CE) 1925/2006, anexo III, parte B", vinculo: "norma" }],
+  ),
+  pg3: pg("PG-3", "Garcinia: parece que no hace lo que promete, pero faltan estudios.", [
+    { cita: "Maunder 2020", pmid: "31984610", vinculo: "en-dosier" },
+    { cita: "Golzarand 2020", pmid: "32951714", vinculo: "en-dosier" },
+  ]),
+  pg3Aviso: pg(
+    "PG-3, seguridad",
+    "Hay casos raros, pero documentados, de daño en el hígado en personas que la tomaban, sola o mezclada con té verde.",
     [
-      { cita: "Maunder 2020", pmid: "31984610", vinculo: "en-dosier" },
-      { cita: "Golzarand 2020", pmid: "32951714", vinculo: "en-dosier" },
       { cita: "LiverTox (NIH), Garcinia cambogia", vinculo: "organismo" },
       { cita: "Vuppalanchi 2022", pmid: "34400337", vinculo: "en-dosier" },
     ],
@@ -282,14 +292,14 @@ const PG = {
       { cita: "Pooyandjoo 2016", pmid: "27335245", vinculo: "en-dosier" },
     ],
   ),
-  pg6: pg(
-    "PG-6",
-    "CLA: parece que no hace lo que promete, y es bastante probable: en los estudios de más calidad no se vio ningún efecto. La EFSA no aceptó la declaración que se pidió para una mezcla de CLA, entre otras cosas porque subían algunos marcadores de inflamación.",
-    [
-      { cita: "Asbaghi 2024", pmid: "37671495", vinculo: "en-dosier" },
-      { cita: "Bessell 2021", pmid: "33976376", vinculo: "en-dosier" },
-      { cita: "EFSA 2015", vinculo: "organismo" },
-    ],
+  pg6: pg("PG-6", "CLA: parece que no hace lo que promete, y es bastante probable: en los estudios de más calidad no se vio ningún efecto.", [
+    { cita: "Asbaghi 2024", pmid: "37671495", vinculo: "en-dosier" },
+    { cita: "Bessell 2021", pmid: "33976376", vinculo: "en-dosier" },
+  ]),
+  pg6Aviso: pg(
+    "PG-6, seguridad",
+    "La EFSA no aceptó la declaración que se pidió para una mezcla de CLA, entre otras cosas porque subían algunos marcadores de inflamación.",
+    [{ cita: "EFSA 2015", vinculo: "organismo" }],
   ),
   pg8: pg(
     "PG-8",
@@ -443,10 +453,10 @@ export const LISTAS: Lista[] = [
     noNecesitas: {
       entradilla: "Lo que se vende para perder grasa, con lo que dicen los estudios y los avisos de seguridad que hay. Sin marcas ni productos.",
       lineas: [
-        { nombre: "Extracto de té verde", frase: PG.pg2, estado: "borrador" },
-        { nombre: "Garcinia", frase: PG.pg3, estado: "borrador" },
+        { nombre: "Extracto de té verde", frase: PG.pg2, estado: "borrador", aviso: { visible: PG.pg2Aviso, porque: PG.pg2Porque } },
+        { nombre: "Garcinia", frase: PG.pg3, estado: "borrador", aviso: { visible: PG.pg3Aviso } },
         { nombre: "L-carnitina", frase: PG.pg5, estado: "borrador" },
-        { nombre: "CLA", frase: PG.pg6, estado: "borrador" },
+        { nombre: "CLA", frase: PG.pg6, estado: "borrador", aviso: { visible: PG.pg6Aviso } },
         { nombre: "Productos que se venden como «naturales»", frase: PG.pg8, estado: "borrador" },
         {
           nombre: "Otros productos",
@@ -567,7 +577,7 @@ export function fuentesDe(l: Lista) {
   const frases: FraseLista[] = [
     ...b.plato,
     ...b.tarjetas.flatMap((t) => [t.frase, ...t.porque]),
-    ...b.noNecesitas.map((x) => x.frase),
+    ...b.noNecesitas.flatMap((x) => [x.frase, ...(x.aviso ? [x.aviso.visible, ...(x.aviso.porque ? [x.aviso.porque] : [])] : [])]),
     ...b.estudiado,
   ];
   const citas = new Map<string, boolean>();

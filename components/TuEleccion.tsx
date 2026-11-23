@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import type { Circunstancia } from "@/contenido/listas";
 
 /**
@@ -21,6 +21,8 @@ export function TuEleccion({
 }) {
   const [marcadas, setMarcadas] = useState<Circunstancia[]>([]);
   const [anuncio, setAnuncio] = useState("");
+  const [abierta, setAbierta] = useState(false);
+  const id = useId();
 
   useEffect(() => {
     const fichas = (document.documentElement.dataset.c ?? "").split(" ");
@@ -38,16 +40,35 @@ export function TuEleccion({
   };
 
   const volver = `/#${[slug, ...marcadas].join(",")}`;
+  const resumen = marcadas.length
+    ? circunstancias
+        .filter((c) => marcadas.includes(c.id))
+        .map((c) => c.texto)
+        .join(", ")
+    : "Nada marcado";
 
   return (
     <section className="tu-eleccion" aria-labelledby="h-tu-eleccion">
       <h2 id="h-tu-eleccion" className="sr-only">
         Tu elección
       </h2>
-      <p>
-        Tu objetivo: <strong>{nombre}</strong> · <a href={volver}>Cambiar</a>
+      <p className="te-linea">
+        <strong className="te-objetivo">{nombre}</strong>
+        <span aria-hidden="true"> · </span>
+        <button
+          type="button"
+          className="te-resumen solo-js"
+          aria-expanded={abierta}
+          aria-controls={`${id}-circ`}
+          onClick={() => setAbierta((a) => !a)}
+        >
+          <span className="sr-only">Lo que has marcado: </span>
+          {resumen}
+        </button>
+        <span aria-hidden="true" className="solo-js"> · </span>
+        <a href={volver}>Cambiar</a>
       </p>
-      <fieldset className="te-circunstancias solo-js">
+      <fieldset id={`${id}-circ`} className="te-circunstancias solo-js" data-abierta={abierta ? "" : undefined}>
         <legend>Lo que has marcado</legend>
         <ul className="pastillas pastillas-pequenas">
           {circunstancias.map((c) => (
@@ -59,7 +80,6 @@ export function TuEleccion({
             </li>
           ))}
         </ul>
-        {marcadas.length === 0 ? <p className="te-nada">Nada marcado</p> : null}
         <p className="po-privacidad">Lo que marques se queda en tu navegador: no lo guardamos ni nos llega.</p>
       </fieldset>
       {children}

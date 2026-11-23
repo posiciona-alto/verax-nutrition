@@ -5,7 +5,8 @@
  * Las frases de nutrición van tal cual, con su código: C-n sale de contenido/datos/creatina.json; P-n, G-n y F-n, del
  * texto que el ciencia-nutricion copió de sus dosieres aprobados. Lo que aún no tiene frase es un hueco «pendiente de ciencia».
  */
-import { RUTA_CALCULADORA } from "@/contenido/sitio";
+import { MODO_CONCEPTO, RUTA_CALCULADORA } from "@/contenido/sitio";
+import { frase as fraseDe, fuente as fuenteDe, vinculosDe } from "@/lib/evidencia";
 
 export type Circunstancia = "vegano" | "vegetariano" | "sin-lactosa" | "sin-gluten" | "estomago";
 
@@ -17,7 +18,7 @@ export const CIRCUNSTANCIAS: { id: Circunstancia; texto: string }[] = [
   { id: "estomago", texto: "Estómago sensible" },
 ];
 
-export type Vinculo = "sin" | "con" | "organismo" | "en-dosier";
+export type Vinculo = "sin" | "con" | "organismo" | "norma" | "en-dosier";
 export type FuenteLibre = { cita: string; pmid?: string; vinculo: Vinculo; detalle?: string };
 
 /** Una frase de la lista: de creatina.json, copiada de un dosier aprobado o un hueco que llena el ciencia-nutricion. */
@@ -68,8 +69,7 @@ export type Lista = {
   plato?: { entradilla: string; frases: (FraseLista & { estado?: Estado })[]; guia?: { texto: string; href: string; pendiente: string } };
   suplementos?: { titulo: string; entradilla: string; tarjetas: Tarjeta[] };
   noNecesitas?: { entradilla: string; lineas: LineaNoNecesitas[] };
-  estudiado?: { pendiente: string };
-  alternativa?: string;
+  estudiado?: { frases: FraseLista[]; estado?: Estado };
   calculadoras?: Calculadora[];
   compara: boolean;
   llevate: "dos" | "guardar";
@@ -234,6 +234,104 @@ const B8: FraseLista = {
   ],
 };
 
+/** Picos de glucosa, frase 14: entra en Resistencia (decisión de Natalia del 23-11-2026). */
+const G14: FraseLista = {
+  tipo: "libre",
+  codigo: "G-14",
+  dosier: "picos de glucosa",
+  texto:
+    "En esfuerzos largos, la recomendación habitual (revisión de consenso de 2011) es tomar entre 30 y 60 g de carbohidratos por hora, y hasta 90 g en pruebas de más de dos horas y media.",
+  fuentes: [
+    { cita: "Burke 2011", pmid: "21660838", vinculo: "en-dosier", detalle: "el último autor tiene un vínculo posterior (desde 2013) con bebidas deportivas" },
+  ],
+};
+
+/**
+ * Perder grasa: dosier v2 (evidencia/perder-grasa.md, apartado 7), pendiente del sí final de Natalia. Solo en el concepto.
+ * Siguen el 7 ter: nada de kilos, calorías, plazos ni «quemar»; sin nombres de productos ilegales; el glucomanano y los
+ * sustitutivos de comidas no salen. Solo se nombran productos que la gente ya busca; el resto queda como hueco.
+ */
+const PG_DOSIER = "perder grasa (v2, sin aprobar)";
+const pg = (codigo: string, texto: string, fuentes: FuenteLibre[]): FraseLista => ({ tipo: "libre", codigo, dosier: PG_DOSIER, texto, fuentes });
+const PG = {
+  pg2: pg(
+    "PG-2",
+    "Extracto de té verde: parece que no hace lo que promete, y es bastante probable. Además, la EFSA vio que con 800 mg o más al día de su sustancia principal (EGCG) en complemento suben las enzimas del hígado, y no pudo fijar una dosis segura para los complementos. Por eso en la UE cada toma diaria tiene que llevar menos de esa cantidad y la etiqueta debe avisar de que no lo tomen embarazadas, mujeres que dan el pecho ni menores de 18 años, de que no se tome en ayunas y de que no se sume a otros productos con té verde. El té verde en infusión no entra en esta restricción y se considera en general seguro.",
+    [
+      { cita: "Jurgens 2012", pmid: "23235664", vinculo: "en-dosier" },
+      { cita: "Maunder 2020", pmid: "31984610", vinculo: "en-dosier" },
+      { cita: "EFSA 2018", vinculo: "organismo" },
+      { cita: "Reg. (CE) 1925/2006, anexo III, parte B", vinculo: "norma" },
+    ],
+  ),
+  pg3: pg(
+    "PG-3",
+    "Garcinia: parece que no hace lo que promete, pero faltan estudios. Hay casos raros, pero documentados, de daño en el hígado en personas que la tomaban, sola o mezclada con té verde.",
+    [
+      { cita: "Maunder 2020", pmid: "31984610", vinculo: "en-dosier" },
+      { cita: "Golzarand 2020", pmid: "32951714", vinculo: "en-dosier" },
+      { cita: "LiverTox (NIH), Garcinia cambogia", vinculo: "organismo" },
+      { cita: "Vuppalanchi 2022", pmid: "34400337", vinculo: "en-dosier" },
+    ],
+  ),
+  pg5: pg(
+    "PG-5",
+    "L-carnitina: parece que su efecto, si existe, es muy pequeño y se va reduciendo con el tiempo, pero faltan estudios. Casi todos se hicieron en personas con sobrepeso que no entrenaban.",
+    [
+      { cita: "Talenezhad 2020", pmid: "32359762", vinculo: "en-dosier" },
+      { cita: "Pooyandjoo 2016", pmid: "27335245", vinculo: "en-dosier" },
+    ],
+  ),
+  pg6: pg(
+    "PG-6",
+    "CLA: parece que no hace lo que promete, y es bastante probable: en los estudios de más calidad no se vio ningún efecto. La EFSA no aceptó la declaración que se pidió para una mezcla de CLA, entre otras cosas porque subían algunos marcadores de inflamación.",
+    [
+      { cita: "Asbaghi 2024", pmid: "37671495", vinculo: "en-dosier" },
+      { cita: "Bessell 2021", pmid: "33976376", vinculo: "en-dosier" },
+      { cita: "EFSA 2015", vinculo: "organismo" },
+    ],
+  ),
+  pg8: pg(
+    "PG-8",
+    "Algunos productos que se venden como \u201cnaturales\u201d para adelgazar llevan medicamentos escondidos que no aparecen en la etiqueta. En España se retiran a menudo: las alertas están en la web de la AESAN y de la AEMPS.",
+    [{ cita: "AESAN, alerta ES2026/535 (02-09-2026)", vinculo: "organismo" }],
+  ),
+  pg10: pg(
+    "PG-10",
+    "En conjunto, dos revisiones grandes de ensayos con placebo, una de 67 ensayos y otra de 54, concluyeron que no hay pruebas suficientes para recomendar ninguno de estos productos: los pocos efectos que vieron eran tan pequeños que los propios investigadores no los consideraron relevantes.",
+    [
+      { cita: "Bessell 2021", pmid: "33976376", vinculo: "en-dosier" },
+      { cita: "Maunder 2020", pmid: "31984610", vinculo: "en-dosier" },
+    ],
+  ),
+  pg11: pg(
+    "PG-11",
+    "Entrenar fuerza ayuda a conservar y a ganar músculo: parece que es así, y es bastante probable. Casi todos los estudios se hicieron en personas con sobrepeso o mayores; en gente que ya entrena hay menos estudios.",
+    [
+      { cita: "Lopez 2022", pmid: "35191588", vinculo: "en-dosier" },
+      { cita: "Sardeli 2018", pmid: "29596307", vinculo: "en-dosier" },
+    ],
+  ),
+  pg12: pg(
+    "PG-12",
+    "Comer suficiente proteína también cuenta: parece que comer algo más que el mínimo recomendado ayuda a ganar algo más de músculo cuando se entrena fuerza, pero faltan estudios. Cuánta te hace falta a ti depende de tu caso.",
+    [
+      { cita: "Hudson 2020", pmid: "31794597", vinculo: "en-dosier" },
+      { cita: "Dosier de proteína", vinculo: "en-dosier" },
+    ],
+  ),
+  pg13: pg(
+    "PG-13",
+    "Comer poco para lo que entrenas tiene un precio: en los estudios, quienes entrenaban fuerza comiendo menos de lo que gastaban ganaban menos músculo, aunque la fuerza subía igual. Parece que es así, pero faltan estudios.",
+    [{ cita: "Murphy y Koehler 2022", pmid: "34623696", vinculo: "en-dosier" }],
+  ),
+  pg14: pg(
+    "PG-14",
+    "El Comité Olímpico Internacional llama REDs (deficiencia relativa de energía en el deporte) al conjunto de problemas de salud y de rendimiento que aparecen cuando se come poco para lo que se entrena. Afecta a mujeres y a hombres.",
+    [{ cita: "Mountjoy 2023", pmid: "37752011", vinculo: "en-dosier" }],
+  ),
+};
+
 const AVISO_VISIBLE =
   "Si tienes alguna enfermedad, estás embarazada o das el pecho, o tomas medicación, consúltalo antes con tu médico.";
 
@@ -336,7 +434,7 @@ export const LISTAS: Lista[] = [
   },
   {
     slug: "perder-grasa",
-    boton: "Perder grasa / definir",
+    boton: "Perder grasa",
     nombre: "perder grasa",
     title: "Tu lista: perder grasa · Verax Nutrition",
     h1: "Perder grasa: qué dicen los estudios (y qué no necesitas)",
@@ -345,15 +443,23 @@ export const LISTAS: Lista[] = [
     noNecesitas: {
       entradilla: "Lo que se vende para perder grasa, con lo que dicen los estudios y los avisos de seguridad que hay. Sin marcas ni productos.",
       lineas: [
-        { nombre: "[pendiente de ciencia: nombre de la categoría]", frase: pendiente("dosier 1", "frase y aviso de seguridad"), estado: "borrador" },
-        { nombre: "Garcinia", frase: pendiente("dosier 1", "frase y aviso de seguridad"), estado: "borrador" },
-        { nombre: "L-carnitina", frase: pendiente("dosier 1", "frase y aviso de seguridad"), estado: "borrador" },
-        { nombre: "CLA", frase: pendiente("dosier 1", "frase y aviso de seguridad"), estado: "borrador" },
-        { nombre: "Extracto de té verde", frase: pendiente("dosier 1", "frase y lo que haya dicho la EFSA sobre el hígado"), estado: "borrador" },
+        { nombre: "Extracto de té verde", frase: PG.pg2, estado: "borrador" },
+        { nombre: "Garcinia", frase: PG.pg3, estado: "borrador" },
+        { nombre: "L-carnitina", frase: PG.pg5, estado: "borrador" },
+        { nombre: "CLA", frase: PG.pg6, estado: "borrador" },
+        { nombre: "Productos que se venden como «naturales»", frase: PG.pg8, estado: "borrador" },
+        {
+          nombre: "Otros productos",
+          frase: pendiente(
+            "PG-1, PG-4, PG-7, PG-9 y PG-9 bis",
+            "nombran productos sin búsquedas comprobadas en España; solo salen los que tengan el dato del arquitecto-seo (decisión de Natalia)",
+          ),
+          estado: "borrador",
+        },
+        { nombre: "En conjunto", frase: PG.pg10, estado: "borrador" },
       ],
     },
-    estudiado: { pendiente: "dosier 2, «Perder grasa sin perder músculo»: solo sale si se puede contar sin cifras de comida, de energía ni de cuerpo" },
-    alternativa: "Si lo que buscas es ganar fuerza o cuidar tu salud, tienes estas listas:",
+    estudiado: { frases: [PG.pg11, PG.pg12, PG.pg13, PG.pg14], estado: "borrador" },
     compara: false,
     llevate: "guardar",
     paraTuCaso: true,
@@ -373,7 +479,7 @@ export const LISTAS: Lista[] = [
         pendiente("A-13", "frase del piloto del agua, tal cual"),
         pendiente("A-15", "frase del piloto del agua, tal cual"),
         pendiente("A-18", "frase del piloto del agua, tal cual"),
-        pendiente("G-14", "hidratos por hora en esfuerzos largos; sale si Natalia lo aprueba"),
+        G14,
       ],
     },
     noNecesitas: {
@@ -439,4 +545,58 @@ export function temasRevisados(l: Lista): number {
   l.suplementos?.tarjetas.forEach((t) => mirar(t.frase));
   l.noNecesitas?.lineas.forEach((x) => mirar(x.frase, x.estado));
   return dosieres.size;
+}
+
+/** Lo que no sale de un dosier aprobado solo se ve en la web de concepto, con su marca. */
+export const verEstado = (estado?: Estado) => estado !== "borrador" || MODO_CONCEPTO;
+export const verFrase = (f: FraseLista, estado?: Estado) => verEstado(estado) && (f.tipo !== "pendiente" || MODO_CONCEPTO);
+
+/** Lo que se ve de cada bloque de una lista, con las mismas reglas en la lista y en el cuadro de la portada. */
+export function bloquesDe(l: Lista) {
+  const plato = l.plato ? l.plato.frases.filter((f) => verFrase(f, f.estado)) : [];
+  const tarjetas = l.suplementos?.tarjetas ?? [];
+  const noNecesitas = l.noNecesitas ? l.noNecesitas.lineas.filter((x) => verFrase(x.frase, x.estado)) : [];
+  const estudiado = l.estudiado && verEstado(l.estudiado.estado) ? l.estudiado.frases.filter((f) => verFrase(f)) : [];
+  const calculadoras = (l.calculadoras ?? []).filter((c) => c.href || MODO_CONCEPTO);
+  return { plato, tarjetas, noNecesitas, estudiado, calculadoras };
+}
+
+/** Fuentes distintas de lo que se ve, y cuántas tienen financiación o vínculos del sector. */
+export function fuentesDe(l: Lista) {
+  const b = bloquesDe(l);
+  const frases: FraseLista[] = [
+    ...b.plato,
+    ...b.tarjetas.flatMap((t) => [t.frase, ...t.porque]),
+    ...b.noNecesitas.map((x) => x.frase),
+    ...b.estudiado,
+  ];
+  const citas = new Map<string, boolean>();
+  const sinDato = new Set<string>();
+  frases.forEach((f) => {
+    if (f.tipo === "creatina") fraseDe(f.n).fuentes.forEach((id) => citas.set(id, vinculosDe(fuenteDe(id)) === "con"));
+    if (f.tipo === "libre")
+      f.fuentes.forEach((x) => {
+        if (x.vinculo !== "en-dosier" || x.pmid) citas.set(x.cita, x.vinculo === "con");
+        if (x.vinculo === "en-dosier" && x.pmid) sinDato.add(x.cita);
+      });
+  });
+  const todasCreatina = frases.length > 0 && frases.every((f) => f.tipo === "creatina");
+  /** Las fuentes cuyo pago aún no está pasado a la web: se dicen, para no presentar un 0 que no lo es. */
+  return { total: citas.size, con: [...citas.values()].filter(Boolean).length, sinDato: sinDato.size, todasCreatina };
+}
+
+/** Las filas del cuadro «Esta lista, por dentro»: siempre las mismas cuatro, para que la portada no salte al elegir. */
+export function filasCuadro(l: Lista) {
+  const b = bloquesDe(l);
+  const f = fuentesDe(l);
+  return {
+    dosieres: temasRevisados(l),
+    filas: [
+      { id: "plato", texto: "Primero, el plato", n: b.plato.filter((x) => x.tipo !== "pendiente").length },
+      { id: "suplementos", texto: "Suplementos con estudios", n: b.tarjetas.length },
+      { id: "no-necesitas", texto: "Lo que no necesitas", n: b.noNecesitas.filter((x) => x.frase.tipo !== "pendiente").length },
+      { id: "en-que-se-basa", texto: "Quién pagó cada estudio", n: f.total },
+    ],
+    fuentes: f,
+  };
 }

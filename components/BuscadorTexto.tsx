@@ -70,6 +70,9 @@ export function BuscadorTexto({
       <label htmlFor={`${id}-campo`} className="bt-etiqueta">
         ¿Ya sabes lo que buscas?
       </label>
+      <p id={`${id}-pista`} className="bt-pista">
+        Por ejemplo: creatina, whey, proteína
+      </p>
       <div className="bt-campo">
         <Search size={18} strokeWidth={1.5} aria-hidden="true" className="bt-lupa" />
         <input
@@ -82,7 +85,7 @@ export function BuscadorTexto({
           aria-activedescendant={mostrar && activa >= 0 ? opcion(activa) : undefined}
           autoComplete="off"
           spellCheck={false}
-          placeholder="creatina, whey, proteína…"
+          aria-describedby={`${id}-pista`}
           value={texto}
           onChange={(e) => {
             setTexto(e.target.value);

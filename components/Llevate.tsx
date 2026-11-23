@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState } from "react";
+import { forwardRef, useId, useRef, useState } from "react";
+import { CircleAlert } from "lucide-react";
 
 const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -78,12 +79,16 @@ function Legal({ para, cuanto }: { para: string; cuanto: string }) {
   );
 }
 
-function Correo({ valor, poner, error }: { valor: string; poner: (v: string) => void; error: boolean }) {
+const Correo = forwardRef<HTMLInputElement, { valor: string; poner: (v: string) => void; error: boolean }>(function Correo(
+  { valor, poner, error },
+  ref,
+) {
   const id = useId();
   return (
     <div className="campo">
       <label htmlFor={id}>Correo electrónico</label>
       <input
+        ref={ref}
         id={id}
         type="email"
         inputMode="email"
@@ -96,10 +101,32 @@ function Correo({ valor, poner, error }: { valor: string; poner: (v: string) => 
       />
       {error ? (
         <p id={`${id}-error`} className="campo-error">
-          Escribe un correo con @, por ejemplo nombre@correo.es
+          <CircleAlert size={16} strokeWidth={2} aria-hidden="true" /> Escribe un correo con @, por ejemplo nombre@correo.es
         </p>
       ) : null}
     </div>
+  );
+});
+
+/** Si falta algo, el foco va a lo primero que falta y el error se dice en palabra e icono (crítica v3, punto 8). */
+function useEnvio(valido: () => boolean, correoOk: () => boolean) {
+  const [intento, setIntento] = useState(false);
+  const [hecho, setHecho] = useState(false);
+  const campo = useRef<HTMLInputElement>(null);
+  const casilla = useRef<HTMLInputElement>(null);
+  const enviar = () => {
+    if (valido()) return setHecho(true);
+    setIntento(true);
+    (correoOk() ? casilla.current : campo.current)?.focus();
+  };
+  return { intento, hecho, campo, casilla, enviar };
+}
+
+function ErrorCasilla({ id, texto }: { id: string; texto: string }) {
+  return (
+    <p id={id} className="campo-error">
+      <CircleAlert size={16} strokeWidth={2} aria-hidden="true" /> {texto}
+    </p>
   );
 }
 
@@ -116,39 +143,34 @@ function Hecho({ texto }: { texto: string }) {
 function Guardar({ objetivo }: { objetivo: string }) {
   const [correo, setCorreo] = useState("");
   const [acepta, setAcepta] = useState(false);
-  const [intento, setIntento] = useState(false);
-  const [hecho, setHecho] = useState(false);
-  const valido = CORREO.test(correo) && acepta;
+  const { intento, hecho, campo, casilla, enviar } = useEnvio(() => CORREO.test(correo) && acepta, () => CORREO.test(correo));
 
   if (hecho) return <Hecho texto="Te hemos mandado un enlace. Sin confirmar, no te mandamos la lista." />;
   return (
     <div className="llevate-form">
       <p>Te mandamos esta lista por correo, una sola vez. No te apuntamos a nada.</p>
       <p className="t-secundario mt-2">Lo que hayas marcado (vegano, sin lactosa…) no va en el correo: se queda en tu navegador.</p>
-      <Correo valor={correo} poner={setCorreo} error={intento && !CORREO.test(correo)} />
+      <Correo ref={campo} valor={correo} poner={setCorreo} error={intento && !CORREO.test(correo)} />
       <label className="opcion casilla-aparte">
-        <input type="checkbox" checked={acepta} onChange={(e) => setAcepta(e.target.checked)} />
+        <input
+          ref={casilla}
+          type="checkbox"
+          checked={acepta}
+          onChange={(e) => setAcepta(e.target.checked)}
+          aria-invalid={(intento && !acepta) || undefined}
+          aria-describedby={intento && !acepta ? "error-casilla-guardar" : undefined}
+        />
         <span>Quiero recibir esta lista por correo. Solo este correo; no es un boletín.</span>
       </label>
+      {intento && !acepta ? <ErrorCasilla id="error-casilla-guardar" texto="Para mandártela, marca la casilla." /> : null}
       <Legal
         para={`mandarte la lista de ${objetivo} una vez, y nada más.`}
         cuanto="borramos tu correo después de enviarla [VERIFICAR: plazo real, incluido el registro de envíos de Resend]."
       />
       <p className="t-nota">Es para mayores de 18 años.</p>
-      <button
-        type="button"
-        className="boton boton-ver"
-        aria-disabled={!valido}
-        aria-describedby={!valido ? "motivo-guardar" : undefined}
-        onClick={() => (valido ? setHecho(true) : setIntento(true))}
-      >
+      <button type="button" className="boton boton-ver" onClick={enviar}>
         Mandarme la lista
       </button>
-      {!valido ? (
-        <p id="motivo-guardar" className="t-nota t-secundario">
-          Para mandártela, escribe tu correo y marca la casilla.
-        </p>
-      ) : null}
     </div>
   );
 }
@@ -160,10 +182,8 @@ function Avisar() {
   const [raciones, setRaciones] = useState<"0,5" | "1" | "2">("1");
   const [correo, setCorreo] = useState("");
   const [acepta, setAcepta] = useState(false);
-  const [intento, setIntento] = useState(false);
-  const [hecho, setHecho] = useState(false);
+  const { intento, hecho, campo, casilla, enviar } = useEnvio(() => CORREO.test(correo) && acepta, () => CORREO.test(correo));
   const id = useId();
-  const valido = CORREO.test(correo) && acepta;
 
   const g = Number(gramos.replace(",", "."));
   let fecha = "[fecha]";
@@ -234,30 +254,27 @@ function Avisar() {
         </fieldset>
       )}
       <p className="t-datos">Se acaba hacia el {fecha}</p>
-      <Correo valor={correo} poner={setCorreo} error={intento && !CORREO.test(correo)} />
+      <Correo ref={campo} valor={correo} poner={setCorreo} error={intento && !CORREO.test(correo)} />
       <label className="opcion casilla-aparte">
-        <input type="checkbox" checked={acepta} onChange={(e) => setAcepta(e.target.checked)} />
+        <input
+          ref={casilla}
+          type="checkbox"
+          checked={acepta}
+          onChange={(e) => setAcepta(e.target.checked)}
+          aria-invalid={(intento && !acepta) || undefined}
+          aria-describedby={intento && !acepta ? "error-casilla-avisar" : undefined}
+        />
         <span>Quiero recibir el aviso de que se acaba mi bote, con un enlace al comparador de la web. Solo para esto; no es un boletín.</span>
       </label>
+      {intento && !acepta ? <ErrorCasilla id="error-casilla-avisar" texto="Para apuntarte, marca la casilla." /> : null}
       <Legal
         para="enviarte un correo hacia la fecha en que se acaba tu bote."
         cuanto="hasta que te des de baja, con un clic en cada correo."
       />
       <p className="t-nota">No te pedimos el peso ni la edad, y tu objetivo no va en el aviso. Es para mayores de 18 años.</p>
-      <button
-        type="button"
-        className="boton boton-ver"
-        aria-disabled={!valido}
-        aria-describedby={!valido ? "motivo-avisar" : undefined}
-        onClick={() => (valido ? setHecho(true) : setIntento(true))}
-      >
+      <button type="button" className="boton boton-ver" onClick={enviar}>
         Apuntarme
       </button>
-      {!valido ? (
-        <p id="motivo-avisar" className="t-nota t-secundario">
-          Para apuntarte, escribe tu correo y marca la casilla.
-        </p>
-      ) : null}
     </div>
   );
 }

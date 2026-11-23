@@ -4,10 +4,9 @@ import { Cabecera } from "@/components/Cabecera";
 import { Pie } from "@/components/Pie";
 import { BandaBorrador } from "@/components/piezas";
 import { NotasMovil } from "@/components/NotasMovil";
-import { NotaUno } from "@/components/notas";
-import { PortadaObjetivos } from "@/components/PortadaObjetivos";
+import { PortadaObjetivos, type CuadroObjetivo } from "@/components/PortadaObjetivos";
 import { BuscadorTexto, type Sugerencia } from "@/components/BuscadorTexto";
-import { CIRCUNSTANCIAS, LISTAS, temasRevisados } from "@/contenido/listas";
+import { CIRCUNSTANCIAS, filasCuadro, LISTAS, temasRevisados } from "@/contenido/listas";
 import { MODO_CONCEPTO, notaUno, PROGRAMAS_ACTIVOS, RUTA_CALCULADORA, sitio, VER_PERDER_GRASA } from "@/contenido/sitio";
 
 /**
@@ -34,6 +33,21 @@ const objetivos = listas.map((l) => {
     sinDosier: l.estado === "borrador",
   };
 });
+
+/** El cuadro pequeño de la portada, con las cifras de cada objetivo (decisión de Natalia, 23-11-2026: sin nivel ni precio). */
+const cuadros: Record<string, CuadroObjetivo> = Object.fromEntries(
+  listas.map((l) => {
+    const c = filasCuadro(l);
+    return [
+      l.slug,
+      {
+        nombre: l.nombre,
+        base: l.estado === "borrador" ? `${l.boton} · dosier sin aprobar` : `${l.boton} · ${c.dosieres} ${c.dosieres === 1 ? "dosier" : "dosieres"}`,
+        filas: c.filas.map((f) => ({ ...f, texto: f.id === "en-que-se-basa" ? `Fuentes (${c.fuentes.con} con vínculos${c.fuentes.sinDato ? ", más las del dosier" : ""})` : f.texto })),
+      },
+    ];
+  }),
+);
 
 /** Índice cerrado del buscador de texto: solo páginas que existen (UX buscador v1, 2.3). */
 const CREATINA = ["creatina", "crea", "creapure", "monohidrato"];
@@ -96,17 +110,22 @@ export default function Portada() {
       {MODO_CONCEPTO ? <BandaBorrador /> : null}
       <Cabecera actual="/" />
       <main id="contenido" className="reticula con-notas portada-v3">
-        <div className="pv-arriba fila">
-          <div className="texto">
-            <h1 className="t-h1-portada pv-h1">{TITULAR}</h1>
-            <p className="pv-sub solo-escritorio">Primero el plato, después el bote. Y en cada estudio, quién lo pagó.</p>
-          </div>
-          <div className="notas solo-escritorio">
-            <NotaUno texto={notaUno.portada} />
-          </div>
-        </div>
-
-        <PortadaObjetivos objetivos={objetivos} circunstancias={CIRCUNSTANCIAS}>
+        <PortadaObjetivos
+          titular={
+            <>
+              <h1 className="t-h1-portada pv-h1">{TITULAR}</h1>
+              <p className="pv-sub solo-escritorio">Primero el plato, después el bote. Y en cada estudio, quién lo pagó.</p>
+            </>
+          }
+          objetivos={objetivos}
+          circunstancias={CIRCUNSTANCIAS}
+          cuadros={cuadros}
+          pieCuadro={
+            <p>
+              <span className="cl-uno">1</span> {notaUno.portada} <Link href="/como-se-financia/">Cómo se financia&nbsp;→</Link>
+            </p>
+          }
+        >
           <BuscadorTexto
             indice={indice}
             delicadas={DELICADAS}
@@ -119,7 +138,7 @@ export default function Portada() {
           <h2 id="h-sellos" className="franja-titulo">
             Ciencia sin humo: miramos quién paga cada estudio
           </h2>
-          <ul className="sellos">
+          <ul className="sellos sellos-filas">
             {SELLOS.map((s) => (
               <li key={s.titulo} className="sello">
                 <h3 className="sello-titulo">

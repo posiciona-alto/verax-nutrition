@@ -10,11 +10,12 @@ import { NotasMovil } from "@/components/NotasMovil";
 import { TuEleccion } from "@/components/TuEleccion";
 import { FiltroMarca } from "@/components/FiltroMarca";
 import { Llevate } from "@/components/Llevate";
-import { EstilosLlamadas, Llamada, MarcaPago, Nota, NotaUno } from "@/components/notas";
+import { EstilosLlamadas, Llamada, MarcaPago, Nota } from "@/components/notas";
 import { productosEjemplo } from "@/contenido/comparar/creatina-ejemplo";
-import { CIRCUNSTANCIAS, LISTAS, listaDe, PROTEINA, temasRevisados, type FraseLista, type FuenteLibre, type Tarjeta } from "@/contenido/listas";
+import { bloquesDe, CIRCUNSTANCIAS, filasCuadro, LISTAS, listaDe, PROTEINA, type FraseLista, type FuenteLibre, type Tarjeta } from "@/contenido/listas";
+import { CuadroLista } from "@/components/CuadroLista";
 import { MODO_CONCEPTO, notaUno, pie, sitio, VER_PERDER_GRASA } from "@/contenido/sitio";
-import { enlaceDe, frase as fraseDe, fuente as fuenteDe, vinculosDe } from "@/lib/evidencia";
+import { enlaceDe, frase as fraseDe, fuente as fuenteDe } from "@/lib/evidencia";
 import { slugMarca } from "@/lib/texto";
 
 export const dynamicParams = false;
@@ -36,9 +37,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-/** Lo que no sale de un dosier aprobado solo se ve en la web de concepto. */
-const ver = (estado?: string) => estado !== "borrador" || MODO_CONCEPTO;
-const verFrase = (f: FraseLista, estado?: string) => ver(estado) && (f.tipo !== "pendiente" || MODO_CONCEPTO);
 
 type LineaNota = { tipo: "id"; id: string } | { tipo: "libre"; f: FuenteLibre };
 
@@ -68,6 +66,7 @@ function etiquetaLibre(f: FuenteLibre) {
   if (f.vinculo === "con") return `Con financiación o vínculos del sector${f.detalle ? `: ${f.detalle}` : ""}`;
   if (f.vinculo === "sin") return "Sin vínculos conocidos";
   if (f.vinculo === "organismo") return "Organismo público";
+  if (f.vinculo === "norma") return "Norma de la UE";
   return f.detalle ?? null;
 }
 
@@ -140,7 +139,7 @@ function prepara(notas: Notas, frases: FraseLista[]) {
 }
 
 /** Una o varias frases y sus notas, en la misma fila: la nota cae a la altura de su texto. */
-function frasesEnFila(notas: Notas, frases: FraseLista[], opciones: { antes?: ReactNode; className?: string } = {}) {
+function frasesEnFila(notas: Notas, frases: FraseLista[], opciones: { antes?: ReactNode; despues?: ReactNode; className?: string } = {}) {
   const { parrafos, margen } = prepara(notas, frases);
   return (
     <Fila
@@ -149,6 +148,7 @@ function frasesEnFila(notas: Notas, frases: FraseLista[], opciones: { antes?: Re
         <>
           {opciones.antes}
           {parrafos}
+          {opciones.despues}
         </>
       }
       notas={margen}
@@ -161,14 +161,21 @@ function MarcaBorrador({ texto = "Dosier en borrador, no se publica" }: { texto?
 }
 
 function tarjetaSuplemento({ t, notas, vegano }: { t: Tarjeta; notas: Notas; vegano: boolean }) {
+  const corte = t.nivel.indexOf(", ");
   const principal = frasesEnFila(notas, [t.frase], {
     antes: (
-      <>
+      <div className="sup-cabeza">
         <h3 id={`h-${t.id}`} className="t-h3">
           {t.nombre}
         </h3>
-        <p className="nivel-linea">{t.nivel}</p>
-      </>
+        <p className="sup-nivel">
+          <span className="nivel-chip">
+            {corte > 0 ? t.nivel.slice(0, corte) : t.nivel}
+            {corte > 0 ? <span className="sr-only">,</span> : null}
+          </span>{" "}
+          {corte > 0 ? <span className="nivel-ambito">{t.nivel.slice(corte + 2)}</span> : null}
+        </p>
+      </div>
     ),
   });
   const lactosa =
@@ -232,11 +239,12 @@ export default async function PaginaLista({ params }: Props) {
   const l = listaDe((await params).objetivo);
   if (!l) notFound();
   const notas = new Notas();
+  const bloques = bloquesDe(l);
 
   const secciones: { id: string; titulo: string; cuerpo: ReactNode }[] = [];
 
   if (l.plato) {
-    const frases = l.plato.frases.filter((f) => verFrase(f, f.estado));
+    const frases = bloques.plato;
     secciones.push({
       id: "plato",
       titulo: "Primero, el plato",
@@ -279,7 +287,7 @@ export default async function PaginaLista({ params }: Props) {
   }
 
   if (l.noNecesitas) {
-    const lineas = l.noNecesitas.lineas.filter((x) => ver(x.estado));
+    const lineas = bloques.noNecesitas;
     if (lineas.length) {
       secciones.push({
         id: "no-necesitas",
@@ -294,13 +302,11 @@ export default async function PaginaLista({ params }: Props) {
                   <li key={x.nombre}>
                     {frasesEnFila(notas, [x.frase], {
                       antes: (
-                        <>
-                          <p className="nn-nombre">
-                            {x.nombre} {x.estado === "borrador" ? <MarcaBorrador /> : null}
-                          </p>
-                          {certeza ? <p className="nivel-linea">{certeza}</p> : null}
-                        </>
+                        <p className="nn-nombre">
+                          {x.nombre} {x.estado === "borrador" ? <MarcaBorrador /> : null}
+                        </p>
                       ),
+                      despues: certeza ? <p className="nn-certeza">{certeza}</p> : null,
                     })}
                     {x.ficha ? (
                       <p className="enlace-ficha">
@@ -317,26 +323,26 @@ export default async function PaginaLista({ params }: Props) {
     }
   }
 
-  if (l.estudiado && MODO_CONCEPTO) {
+  if (bloques.estudiado.length) {
     secciones.push({
       id: "estudiado",
       titulo: "Lo que sí se ha estudiado",
       cuerpo: (
         <>
-          <p className="hueco">Pendiente de ciencia: {l.estudiado.pendiente}.</p>
-          {l.alternativa ? (
-            <p className="mt-6">
-              <span className="pendiente block">Si el dosier 2 no lo permite, este bloque no sale y queda esta línea:</span>
-              {l.alternativa} <Link href="/tu-lista/ganar-musculo/">Ganar músculo</Link> ·{" "}
-              <Link href="/tu-lista/salud/">Salud / empiezo de cero</Link>
+          {l.estudiado?.estado === "borrador" ? (
+            <p className="mb-4">
+              <MarcaBorrador />
             </p>
           ) : null}
+          {bloques.estudiado.map((f) => (
+            <div key={codigoDe(f)}>{frasesEnFila(notas, [f])}</div>
+          ))}
         </>
       ),
     });
   }
 
-  const calculadoras = (l.calculadoras ?? []).filter((c) => c.href || MODO_CONCEPTO);
+  const calculadoras = bloques.calculadoras;
   if (calculadoras.length) {
     secciones.push({
       id: "calculadoras",
@@ -398,26 +404,46 @@ export default async function PaginaLista({ params }: Props) {
     cuerpo: <Llevate dos={l.llevate === "dos"} objetivo={l.nombre} />,
   });
 
-  const registroAntes = notas.registro.length;
-  const dosieres = temasRevisados(l);
-  const citas = new Map<string, boolean>();
-  notas.registro.forEach((r) =>
-    r.lineas.forEach((x) => {
-      if (x.tipo === "id") citas.set(x.id, vinculosDe(fuenteDe(x.id)) === "con");
-      else if (x.f.vinculo !== "en-dosier" || x.f.pmid) citas.set(x.f.cita, x.f.vinculo === "con");
-    }),
-  );
-  const conVinculos = [...citas.values()].filter(Boolean).length;
-  const todasCreatina = notas.registro.every((r) => r.lineas.every((x) => x.tipo === "id"));
-
+  const cuadro = filasCuadro(l);
+  const sostiene = cuadro.fuentes.todasCreatina ? "Sí" : MODO_CONCEPTO ? "[DATO]" : "Sí, salvo donde lo decimos en cada ficha";
+  const cuenta: Record<string, number | undefined> = {
+    plato: bloques.plato.filter((x) => x.tipo !== "pendiente").length,
+    suplementos: bloques.tarjetas.length,
+    "no-necesitas": bloques.noNecesitas.filter((x) => x.frase.tipo !== "pendiente").length,
+    estudiado: bloques.estudiado.length,
+    calculadoras: bloques.calculadoras.filter((c) => c.href).length,
+  };
   const resumen = [
-    { dt: "Dosieres revisados", dd: String(dosieres) },
-    { dt: "Fuentes clave", dd: `${citas.size}, ${conVinculos} con financiación o vínculos del sector` },
-    {
-      dt: "¿Se sostiene sin ellas?",
-      dd: todasCreatina && registroAntes ? "Sí" : MODO_CONCEPTO ? "[DATO: lo da cada dosier]" : "Sí, salvo donde lo decimos en cada ficha",
-    },
+    { dt: "Dosieres revisados", dd: String(cuadro.dosieres) },
+    { dt: "Fuentes clave", dd: `${cuadro.fuentes.total}, ${cuadro.fuentes.con} con financiación o vínculos del sector` },
+    { dt: "¿Se sostiene sin ellas?", dd: sostiene === "[DATO]" ? "[DATO: lo da cada dosier]" : sostiene },
   ];
+  const cuadroLista = (
+    <CuadroLista
+      titulo="Esta lista, por dentro"
+      etiqueta="Esta lista, por dentro: índice"
+      base={
+        l.estado === "borrador" ? (
+          <>Dosier sin aprobar · no se publica</>
+        ) : (
+          <>
+            {cuadro.dosieres} {cuadro.dosieres === 1 ? "dosier" : "dosieres"} · revisado el {sitio.revisado}
+          </>
+        )
+      }
+      filas={[
+        ...secciones.map((s) => ({ id: s.id, texto: s.titulo, n: cuenta[s.id], href: `#${s.id}` })),
+        { id: "en-que-se-basa", texto: "En qué se basa", href: "#en-que-se-basa" },
+      ]}
+      fuentes={{ total: cuadro.fuentes.total, con: cuadro.fuentes.con, sinDato: MODO_CONCEPTO ? cuadro.fuentes.sinDato : 0, sostiene }}
+      pie={
+        <p>
+          <span className="cl-uno">1</span> {notaUno.ciencia}{" "}
+          <Link href="/como-se-financia/">Cómo se financia&nbsp;→</Link>
+        </p>
+      }
+    />
+  );
 
   const efectos = CIRCUNSTANCIAS.map((c) => ({ c, e: l.circunstancias[c.id] })).filter(({ e }) => e.tipo === "sin-cambios" || e.texto);
 
@@ -432,12 +458,11 @@ export default async function PaginaLista({ params }: Props) {
           <div className="cabeza-ficha pt-6 md:pt-10">
             <Migas items={migas} />
             <Fila
-              className="mt-6"
               texto={
                 <>
                   {l.estado === "borrador" ? (
                     <p className="mb-3">
-                      <MarcaBorrador texto="Sin dosier, no se publica" />
+                      <MarcaBorrador texto="Dosier sin aprobar, no se publica" />
                     </p>
                   ) : null}
                   <h1 className="t-h1">{l.h1}</h1>
@@ -455,7 +480,8 @@ export default async function PaginaLista({ params }: Props) {
                   </p>
                 </>
               }
-              notas={<NotaUno texto={notaUno.ciencia} />}
+              className="mt-6 fila-cuadro"
+              notas={cuadroLista}
             />
             {l.acab ? (
               <p className="acab-linea">
@@ -464,29 +490,14 @@ export default async function PaginaLista({ params }: Props) {
             ) : null}
           </div>
 
-          <aside className="carril carril-lista" aria-label="Tu elección e índice">
-            <TuEleccion slug={l.slug} nombre={l.nombre} circunstancias={CIRCUNSTANCIAS}>
+          <aside className="carril carril-lista" aria-label="Tu elección">
+            <TuEleccion slug={l.slug} nombre={l.boton} circunstancias={CIRCUNSTANCIAS}>
               {efectos.map(({ c, e }) => (
                 <p key={c.id} className="circ te-efecto" data-circ={c.id}>
-                  {e.tipo === "sin-cambios" ? e.texto : e.texto}
+                  {e.texto}
                 </p>
               ))}
             </TuEleccion>
-            <nav className="indice mt-8" aria-label="En esta lista">
-              <p className="indice-titulo">En esta lista</p>
-              <ol>
-                {secciones.map((s, i) => (
-                  <li key={s.id}>
-                    <a href={`#${s.id}`}>
-                      {i + 1} · {s.titulo}
-                    </a>
-                  </li>
-                ))}
-                <li>
-                  <a href="#en-que-se-basa">En qué se basa</a>
-                </li>
-              </ol>
-            </nav>
           </aside>
 
           <article className="cuerpo">

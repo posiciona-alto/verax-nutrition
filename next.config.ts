@@ -33,6 +33,14 @@ const config: NextConfig = {
   productionBrowserSourceMaps: false,
   trailingSlash: true,
   reactStrictMode: true,
+  /** 308 de las carpetas sin página (arquitecto-seo, 23-11-2026, punto 3): al hijo con más volumen, y /tu-lista/ a la portada. */
+  async redirects() {
+    return [
+      { source: "/comparar", destination: "/comparar/creatina/", permanent: true },
+      { source: "/calculadoras", destination: "/calculadoras/dosis-creatina/", permanent: true },
+      { source: "/tu-lista", destination: "/", permanent: true },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: cabeceras }];
   },

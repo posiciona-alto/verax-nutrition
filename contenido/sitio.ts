@@ -17,13 +17,23 @@ export const sitio = {
 /** Ruta de la calculadora de creatina (arquitectura y UX, 22-11-2026). */
 export const RUTA_CALCULADORA = "/calculadoras/dosis-creatina/";
 
+/**
+ * Menú con 5 entradas (respuesta del arquitecto-seo, 23-11-2026, punto 4): la lista se elige en la portada y los hubs
+ * conservan su enlace en todas las páginas desde «Las guías enteras».
+ */
 export const menu = [
-  { texto: "Objetivos", href: "/#objetivos" },
-  { texto: "Suplementos", href: "/#suplementos" },
+  { texto: "Tu lista por objetivo", href: "/" },
+  { texto: "Guías", href: "/#guias" },
+  { texto: "Suplementos", href: "/creatina/" },
   { texto: "Comparar", href: "/comparar/creatina/" },
   { texto: "Calculadoras", href: RUTA_CALCULADORA },
-  { texto: "Quién pagó el estudio", href: "/#quien-pago" },
 ];
+
+/**
+ * «Perder grasa / definir» (decisión P-2 · A de Natalia, 23-11-2026): no sale en producción hasta que esté aprobado su
+ * dosier. En la web de concepto se enseña con la marca «Sin dosier, no se publica».
+ */
+export const DOSIER_PERDER_GRASA_APROBADO = false;
 
 export const financiacion = PROGRAMAS_ACTIVOS
   ? {
@@ -95,3 +105,6 @@ export type Certeza = keyof typeof certezas;
  * fórmula de movimiento (2.6): sin todas las frases de la página evaluadas, el botón no aparece.
  */
 export const MODO_CONCEPTO = true;
+
+/** El objetivo «Perder grasa» se pinta si su dosier está aprobado o, con su marca, en la web de concepto. */
+export const VER_PERDER_GRASA = DOSIER_PERDER_GRASA_APROBADO || MODO_CONCEPTO;

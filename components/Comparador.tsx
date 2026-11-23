@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { slugMarca } from "@/lib/texto";
 import { flushSync } from "react-dom";
 import { ExternalLink, SlidersHorizontal } from "lucide-react";
 import type { Dato, ProductoEjemplo } from "@/contenido/comparar/creatina-ejemplo";
@@ -62,7 +63,20 @@ export function Comparador({ productos, afiliado, avisoCreapure, avisoSellos }: 
   const [orden, setOrden] = useState<Orden>("dosis");
   const [filtros, setFiltros] = useState<Filtros>(SIN_FILTROS);
   const [borrador, setBorrador] = useState<Filtros>(SIN_FILTROS);
+  const [marca, setMarca] = useState<string | null>(null);
   const hoja = useRef<HTMLDialogElement>(null);
+
+  /**
+   * Desde una lista por objetivo, el comparador se abre con la marca y «Vegano» en el fragmento de la URL
+   * (#marca-<slug>,vegano): no llega al servidor ni a la medición, y no crea URL nuevas.
+   */
+  useEffect(() => {
+    const fichas = decodeURIComponent(window.location.hash.slice(1)).split(",");
+    const pedida = fichas.find((t) => t.startsWith("marca-"))?.slice(6);
+    const encontrada = pedida ? productos.find((p) => slugMarca(p.marca) === pedida)?.marca : undefined;
+    if (encontrada) setMarca(encontrada);
+    if (fichas.includes("vegano")) setFiltros((f) => ({ ...f, vegano: true }));
+  }, [productos]);
 
   const lista = useRef<HTMLOListElement>(null);
   const transicion = useRef<{ skipTransition: () => void } | null>(null);
@@ -109,11 +123,11 @@ export function Comparador({ productos, afiliado, avisoCreapure, avisoSellos }: 
     (!f.vegano || (p.vegano.valor && p.vegano.origen !== "sin-dato"));
 
   const { conEnvio, sinEnvio } = useMemo(() => {
-    const lista = productos.filter((p) => filtra(p, filtros));
+    const lista = productos.filter((p) => filtra(p, filtros) && (!marca || p.marca === marca));
     const clave = orden === "dosis" ? porDosis : porCien;
     const ordenada = [...lista].sort((a, b) => clave(a) - clave(b));
     return { conEnvio: ordenada.filter((p) => p.envio !== null), sinEnvio: ordenada.filter((p) => p.envio === null) };
-  }, [productos, filtros, orden]);
+  }, [productos, filtros, orden, marca]);
 
   const total = conEnvio.length + sinEnvio.length;
   const activos = Object.values(filtros).filter(Boolean).length;
@@ -241,6 +255,14 @@ export function Comparador({ productos, afiliado, avisoCreapure, avisoSellos }: 
           {total} productos
         </p>
       </div>
+      {marca ? (
+        <p className="linea-marca">
+          Solo {marca}.{" "}
+          <button type="button" className="boton-linea" onClick={() => aplicar(() => setMarca(null))}>
+            Ver todas las marcas
+          </button>
+        </p>
+      ) : null}
 
       <dialog ref={hoja} className="hoja-filtros" aria-labelledby="titulo-filtros">
         <form method="dialog">

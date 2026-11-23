@@ -33,7 +33,7 @@ export default function CompararCreatina() {
       <Cabecera actual="/comparar/creatina/" />
       <main id="contenido" className="con-notas con-barra reticula">
         <div className="pt-6 md:pt-10">
-          <Migas items={[{ texto: "Inicio", href: "/" }, { texto: "Comparar", href: "/#comparar" }, { texto: "Creatina" }]} />
+          <Migas items={[{ texto: "Inicio", href: "/" }, { texto: "Comparador de creatina" }]} />
           <Fila
             className="mt-6"
             texto={

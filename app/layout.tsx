@@ -42,8 +42,10 @@ export const viewport: Viewport = {
  * «Firma»: el ¹ del logotipo llega el último, una vez por sesión y solo en la primera carga de la portada
  * (movimiento-v1, 3.5). La clase se quita al acabar, para que navegar dentro de la web no la repita.
  * «js-notas» se pone antes de pintar: en el móvil las notas cerradas no aparecen y desaparecen al cargar.
+ * En las listas por objetivo, las circunstancias del fragmento (#vegano,sin-lactosa) pasan a data-c antes de pintar,
+ * para que la lista no cambie después de verse. Solo se aceptan las cinco conocidas.
  */
-const ANTES_DE_PINTAR = `(function(){var r=document.documentElement;r.classList.add("js-notas");try{if(location.pathname==="/"&&!sessionStorage.getItem("vx-firma")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){r.classList.add("firma");sessionStorage.setItem("vx-firma","1");setTimeout(function(){r.classList.remove("firma")},900)}}catch(e){}})()`;
+const ANTES_DE_PINTAR = `(function(){var r=document.documentElement;r.classList.add("js-notas");try{if(location.pathname.indexOf("/tu-lista/")===0){var v=["vegano","vegetariano","sin-lactosa","sin-gluten","estomago"],h=decodeURIComponent(location.hash.slice(1)).split(",").filter(function(t){return v.indexOf(t)>-1});r.dataset.c=h.join(" ")}}catch(e){}try{if(location.pathname==="/"&&!sessionStorage.getItem("vx-firma")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){r.classList.add("firma");sessionStorage.setItem("vx-firma","1");setTimeout(function(){r.classList.remove("firma")},900)}}catch(e){}})()`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

@@ -258,7 +258,7 @@ export default function FichaCreatina() {
   return (
     <>
       {MODO_CONCEPTO && datosEnBorrador ? <BandaBorrador /> : null}
-      <Cabecera actual="/#suplementos" />
+      <Cabecera actual="/creatina/" />
       <main id="contenido" className="con-notas">
         <div className="ficha">
           <aside className="carril" aria-label="De dónde sale esto e índice">

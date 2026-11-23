@@ -33,7 +33,7 @@ export default function CalculadoraCreatina() {
       <Cabecera actual="/calculadoras/dosis-creatina/" />
       <main id="contenido" className="con-notas reticula">
         <div className="pt-6 md:pt-10">
-          <Migas items={[{ texto: "Inicio", href: "/" }, { texto: "Calculadoras", href: "/#calculadoras" }, { texto: "Creatina" }]} />
+          <Migas items={[{ texto: "Inicio", href: "/" }, { texto: "Calculadora de creatina" }]} />
           <Fila
             className="mt-6"
             texto={

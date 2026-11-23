@@ -82,7 +82,6 @@ export const formas: Seccion = {
 export const textos = {
   migas: [
     { texto: "Inicio", href: "/" },
-    { texto: "Suplementos", href: "/#suplementos" },
     { texto: "Creatina" },
   ],
   h1: "Creatina: para qué sirve y qué no, según los estudios",

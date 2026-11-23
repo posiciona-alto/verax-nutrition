@@ -30,6 +30,9 @@ const AVISOS = ["Hipertensión", "Embarazo o lactancia", "Enfermedad del riñón
 
 type Tarjeta = { titulo: string; texto: string; href?: string; pendiente?: string };
 
+/** Cuántos resultados da cada objetivo, sin avisos marcados (mismo reparto que los grupos de abajo). */
+const RESULTADOS: Record<Objetivo, number> = { musculo: 5, cero: 5, resistencia: 4, antes: 2, estomago: 1 };
+
 /**
  * Buscador por objetivo. Los avisos de salud son datos de salud (RGPD, art. 9): se quedan en este componente,
  * no se guardan, no van en la URL y no llegan a la medición ni a ningún servidor.
@@ -101,8 +104,11 @@ export function Buscador({ t }: { t: TextosBuscador }) {
                   ir(2);
                 }}
               >
-                {o.texto}
-                <ArrowRight size={22} strokeWidth={1.5} aria-hidden="true" />
+                <span>{o.texto}</span>
+                <span className="objetivo-cuenta">
+                  {RESULTADOS[o.id]} {RESULTADOS[o.id] === 1 ? "resultado" : "resultados"}
+                  <ArrowRight size={22} strokeWidth={1.5} aria-hidden="true" />
+                </span>
               </button>
             </li>
           ))}

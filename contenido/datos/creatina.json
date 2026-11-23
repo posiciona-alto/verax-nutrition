@@ -1,13 +1,13 @@
 {
   "_leeme": {
-    "que_es": "Datos del dosier de la creatina para el momento estrella «Sin ellas» (concepto A «Al margen») y las notas al margen. Sale del dosier aprobado; no lo sustituye ni lo cambia.",
-    "estado": "Borrador. El paso del apartado 6 bis a cada frase lo ha hecho el agente ciencia-nutricion el 23-11-2026; necesita el sí de Natalia antes de usarse en producción.",
+    "que_es": "Datos del dosier de la creatina para el momento estrella «Sin ellas» (concepto A «Al margen») y las notas al margen. Sale del dosier; no lo sustituye ni lo cambia.",
+    "estado": "Borrador. Coincide con la v3 del dosier (sensibilidad frase a frase del apartado 6 bis), que está en parche sin aplicar y pendiente del sí de Natalia. La v2, aprobada el 22-11-2026, no tenía la prueba frase a frase.",
     "reglas": [
       "Los textos de las frases son literales del dosier (apartado 7). Si cambia el dosier, se regenera este archivo; no se editan aquí.",
-      "«sin_ellas» solo tiene cuatro valores: «se sostiene igual», «se sostiene con menos certeza» (con «certeza_sin_ellas»), «no se sostiene» y «sin evaluar» (el 6 bis no tiene prueba para esa frase).",
-      "Una fuente se aparta en «Sin ellas» si «apartar_en_sin_ellas» es true. Es true en las fuentes «con financiación del sector», salvo E6, que el propio 6 bis cuenta entre las que sostienen la conclusión porque su resultado va en contra de quien la financió.",
-      "«fuentes_apartadas» de cada frase es la lista de sus fuentes con «apartar_en_sin_ellas»: true.",
-      "Mientras una página tenga frases «sin evaluar», el botón «Sin ellas» no sale en ella y se usa la «linea_6bis» (fórmula de movimiento, 2.6: no se inventa qué frase se sostiene).",
+      "«sin_ellas» tiene cuatro valores posibles: «se sostiene igual», «se sostiene con menos certeza» (con «certeza_sin_ellas»), «no se sostiene» y «sin evaluar». En la v3 no queda ninguna frase «sin evaluar».",
+      "El botón aparta todas las fuentes con «apartar_en_sin_ellas»: true, que son todas las «con financiación del sector», sin excepciones (v3).",
+      "Una frase se sostiene sin ellas si lo dicen fuentes sin vínculos o si lo que aporta la fuente apartada no favorece a quien paga (un resultado en contra de su interés, un límite de la evidencia o un dato descriptivo). Por eso una frase puede tener «fuentes_apartadas» y seguir en pie: el motivo está en «sin_ellas_por_que».",
+      "Si una frase tiene «partes», la señal «Sin ellas, esto no se sostiene» va solo en la parte que no se sostiene.",
       "Una frase con «pendiente_verificar»: true no se publica hasta cerrar su «pendiente_motivo».",
       "La nota 1 de cada página es siempre «Cómo se financia Verax»; las fuentes se numeran desde la 2 en el orden en que aparecen en la página."
     ]
@@ -15,9 +15,9 @@
   "tema": "creatina",
   "dosier": {
     "archivo": "webs-propias/nutricion-deportiva/evidencia/creatina.md",
-    "version": "v2",
+    "version": "v3",
+    "version_estado": "v3 en parche sin aplicar (webs-propias/nutricion-deportiva/evidencia/parches/2026-11-23-creatina-v3-parche.md), pendiente del sí de Natalia. Aprobada: v2, 22-11-2026.",
     "fecha_busqueda": "2026-11-22",
-    "aprobacion": "Aprobado por Natalia el 22-11-2026, con las comprobaciones pendientes antes de publicar cada frase",
     "proxima_revision": "2027-05-22"
   },
   "generado": {
@@ -48,10 +48,10 @@
   },
   "resumen": {
     "frases": 31,
-    "se_sostiene_igual": 20,
+    "se_sostiene_igual": 25,
     "se_sostiene_con_menos_certeza": 1,
-    "no_se_sostiene": 2,
-    "sin_evaluar": 8,
+    "no_se_sostiene": 5,
+    "sin_evaluar": 0,
     "pendiente_verificar": 3
   },
   "paginas": [
@@ -60,41 +60,42 @@
       "frases": [1, 2, 3, 4, 5, 6, 12, 13, 17, 18, 19, 20, 21, 22],
       "fuentes_distintas": 25,
       "fuentes_con_vinculos_apartadas": 8,
-      "estados": { "se_sostiene_igual": 9, "se_sostiene_con_menos_certeza": 0, "no_se_sostiene": 2, "sin_evaluar": 3 },
+      "estados": { "se_sostiene_igual": 11, "se_sostiene_con_menos_certeza": 0, "no_se_sostiene": 3, "sin_evaluar": 0 },
       "listo_para_boton": false,
-      "motivo": "Las frases 3, 20 y 22 no tienen prueba de sensibilidad en el 6 bis.",
+      "motivo": "Todas las frases están evaluadas; falta el sí de Natalia a la v3. La frase 19 sigue pendiente de verificar.",
       "lleva_nivel_y_declaracion": true
     },
     {
       "ruta": "/calculadoras/dosis-creatina/",
       "frases": [7, 8, 9, 10, 11, 12, 22],
-      "estados": { "se_sostiene_igual": 6, "se_sostiene_con_menos_certeza": 0, "no_se_sostiene": 0, "sin_evaluar": 1 },
+      "estados": { "se_sostiene_igual": 7, "se_sostiene_con_menos_certeza": 0, "no_se_sostiene": 0, "sin_evaluar": 0 },
       "listo_para_boton": false,
-      "motivo": "La frase 22 no tiene prueba de sensibilidad. Además, la página lleva la declaración autorizada (7 bis), pendiente de comprobar en el registro de la UE.",
+      "motivo": "El botón «Sin ellas» es de las fichas de ciencia, no de la calculadora. Además, la página lleva la declaración autorizada (7 bis), pendiente de comprobar en el registro de la UE.",
       "lleva_nivel_y_declaracion": false
     },
     {
       "ruta": "/creatina/mujeres/",
       "frases": [13, 14, 15, 16, 22],
-      "estados": { "se_sostiene_igual": 1, "se_sostiene_con_menos_certeza": 1, "no_se_sostiene": 0, "sin_evaluar": 3 },
+      "estados": { "se_sostiene_igual": 4, "se_sostiene_con_menos_certeza": 1, "no_se_sostiene": 0, "sin_evaluar": 0 },
       "listo_para_boton": false,
-      "motivo": "Las frases 15, 16 y 22 no tienen prueba de sensibilidad; la 14 está pendiente de verificar.",
+      "motivo": "Falta el sí de Natalia a la v3. La frase 14 sigue pendiente de verificar.",
       "lleva_nivel_y_declaracion": false
     },
     {
       "ruta": "/creatina/monohidrato-o-creapure/",
       "frases": [23, 24, 25, 26, 27, 28, 29, 30, 31],
-      "estados": { "se_sostiene_igual": 6, "se_sostiene_con_menos_certeza": 0, "no_se_sostiene": 0, "sin_evaluar": 3 },
+      "estados": { "se_sostiene_igual": 7, "se_sostiene_con_menos_certeza": 0, "no_se_sostiene": 2, "sin_evaluar": 0 },
       "listo_para_boton": false,
-      "motivo": "Las frases 25, 27 y 28 no tienen prueba de sensibilidad; la 31 está pendiente de verificar.",
+      "motivo": "Falta el sí de Natalia a la v3. La frase 31 sigue pendiente de verificar.",
       "lleva_nivel_y_declaracion": false
     },
     {
       "ruta": "/comparar/creatina/",
       "frases": [26, 27, 28, 29, 30, 31],
       "uso": "Solo como información. El efecto, solo con la declaración autorizada (7 bis). Página con afiliado: sin escala de nivel.",
+      "estados": { "se_sostiene_igual": 5, "se_sostiene_con_menos_certeza": 0, "no_se_sostiene": 1, "sin_evaluar": 0 },
       "listo_para_boton": false,
-      "motivo": "Página de comparador, no ficha de ciencia; además, las frases 27 y 28 están sin evaluar.",
+      "motivo": "Página de comparador, no ficha de ciencia.",
       "lleva_nivel_y_declaracion": false
     }
   ],
@@ -114,10 +115,11 @@
     "pendiente_motivo": "Registro de la UE y Excel de AESAN sin comprobar; EUR-Lex no cargó el 22-11-2026 (el texto se copió de EUR-Lex ese mismo día a la biblioteca); EFSA 2011 no leída (error 403)."
   },
   "pendientes_globales": [
-    "Retractaciones en Crossref: solo comprobados Kreider 2017, Gu 2026 y Moret 2011 (esta última el 23-11-2026, al preparar este archivo, sin avisos); el resto dio error 429. En PubMed, 0 retractaciones en todos los PMID.",
+    "Retractaciones en Crossref: solo comprobados Kreider 2017, Gu 2026 y Moret 2011 (esta última el 23-11-2026, sin avisos); el resto dio error 429. En PubMed, 0 retractaciones en todos los PMID.",
     "Semantic Scholar sin usar (error 429).",
     "Open Payments y prensa de los autores principales, sin buscar: puede cambiar alguna marca «no consta» o «sin vínculos conocidos».",
-    "No se ha auditado la financiación de cada ensayo dentro de los metaanálisis (4 bis, «Límite»)."
+    "No se ha auditado la financiación de cada ensayo dentro de los metaanálisis (4 bis, «Límite»).",
+    "Propuestas de texto sin aplicar en la v3 (frases 9, 20, 25 y 28, y el apartado 12): ver «Cambios v3» del dosier."
   ],
   "fuentes": [
     {
@@ -136,7 +138,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Norma de la UE. El dosier no recoge quién solicitó la declaración.",
-      "vinculos_fuente": "Dosier v2, apartado 3 (O1)",
+      "vinculos_fuente": "Dosier, apartado 3 (O1)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -154,7 +156,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin financiación específica; sin conflictos declarados. Autores del COI, la AMA (WADA) y el BMJ.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (texto completo en PMC5867441, leído en parte)",
+      "vinculos_fuente": "Dosier, tabla 4 (texto completo en PMC5867441, leído en parte)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -174,7 +176,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "AIS (Gobierno de Australia).",
-      "vinculos_fuente": "Dosier v2, tabla 4 y 4 bis",
+      "vinculos_fuente": "Dosier, tabla 4 y 4 bis",
       "apartar_en_sin_ellas": false
     },
     {
@@ -192,7 +194,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "financiación",
       "vinculos_texto": "Financiación: Council for Responsible Nutrition (asociación de la industria de suplementos de EE. UU.). Varios autores con becas de vendedores de creatina, consultorías, peritajes, patentes.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (texto completo en PMC5469049, leído en parte) y web de la ISSN, consulta 22-11-2026 (O9)",
+      "vinculos_fuente": "Dosier, tabla 4 (texto completo en PMC5469049, leído en parte) y web de la ISSN, consulta 22-11-2026 (O9)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -210,7 +212,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "Sin financiación. Casi todos los autores con vínculos con la industria de la creatina, varios con Alzchem (dueña de Creapure): Candow, Gualano, Kreider (preside su consejo asesor), Rawson y Smith-Ryan; Antonio es consejero delegado de la ISSN.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (texto completo en PMC7871530, leído en parte)",
+      "vinculos_fuente": "Dosier, tabla 4 (texto completo en PMC7871530, leído en parte)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -228,7 +230,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta en el resumen.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -246,7 +248,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -264,7 +266,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -282,7 +284,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "Candow: investigación pagada por la industria, donaciones, consejo asesor de Alzchem y Create, perito.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -300,7 +302,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "Forbes: asesor previo de una empresa de creatina, donaciones, vende material educativo, asesor de la ISSN y de Bear Balanced.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -318,7 +320,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos declarados.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -336,7 +338,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta en el resumen.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -354,7 +356,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "Candow (Alzchem), Forbes, Schoenfeld (consejo previo de Dymatize).",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -372,7 +374,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin financiación; sin conflictos.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (PMC12590749)",
+      "vinculos_fuente": "Dosier, tabla 4 (PMC12590749)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -390,7 +392,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos declarados.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -408,7 +410,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos declarados.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -426,7 +428,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "financiación",
       "vinculos_texto": "Kreider (consejo de Alzchem), Antonio (ISSN); Alzchem pagó la publicación.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -444,7 +446,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos declarados.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -462,7 +464,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -480,7 +482,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos; solo la publicación pagada por CAPES (agencia pública de Brasil).",
-      "vinculos_fuente": "Dosier v2, tabla 4 (PMC13768353, declaraciones)",
+      "vinculos_fuente": "Dosier, tabla 4 (PMC13768353, declaraciones)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -498,7 +500,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos declarados; sin registro en el resumen.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -516,7 +518,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -534,7 +536,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -552,7 +554,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "Antonio (asesor de Creapure, Bear Balanced y Create), Forbes (donaciones de Creapure), Tinsley (consultora para fabricantes).",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -570,7 +572,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -588,9 +590,8 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "financiación",
       "vinculos_texto": "Donación de Labrada Nutritionals (el etiléster) y AST (el placebo). Resultado en contra de quien donó el etiléster.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (PMC2649889)",
-      "apartar_en_sin_ellas": false,
-      "motivo_no_apartar": "El 6 bis (fila P5 · Formas) la cuenta entre las fuentes que sostienen la conclusión porque su resultado va en contra del interés de quien donó el producto. Se ve con su marca de vínculos, pero no se pliega."
+      "vinculos_fuente": "Dosier, tabla 4 (PMC2649889)",
+      "apartar_en_sin_ellas": true
     },
     {
       "id": "E7",
@@ -607,7 +608,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "financiación",
       "vinculos_texto": "Pagado por Alzchem AG; Kreider, consultor de Woodbolt. Resultado a favor del producto del financiador.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (PMC3479057)",
+      "vinculos_fuente": "Dosier, tabla 4 (PMC3479057)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -625,7 +626,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos declarados.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -643,7 +644,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos declarados.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -661,7 +662,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "CIHR y Canada Foundation for Innovation (públicos); creatina Creapure de Alzchem (no dice si donada); Candow (consejo de Alzchem).",
-      "vinculos_fuente": "Dosier v2, tabla 4 (PMC10487398)",
+      "vinculos_fuente": "Dosier, tabla 4 (PMC10487398)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -679,7 +680,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta en el resumen (sin PMC).",
-      "vinculos_fuente": "Dosier v2, tabla 4. Financiación pendiente de comprobar (apartado 9).",
+      "vinculos_fuente": "Dosier, tabla 4. Financiación pendiente de comprobar (apartado 9).",
       "apartar_en_sin_ellas": false
     },
     {
@@ -697,7 +698,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta en el resumen.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -715,7 +716,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta en el resumen (Forbes tiene vínculos en otros trabajos).",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -733,7 +734,7 @@
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
       "vinculos_texto": "Sin conflictos declarados.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -751,7 +752,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "Candow (consejo de Alzchem).",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -769,7 +770,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -777,7 +778,6 @@
       "cita": "Law 2019",
       "autor": "Law JP",
       "anio": 2019,
-      "aviso": "El dosier lo cita como «Law 2018»; PubMed da 2019 como año de publicación (puede ser la fecha en línea frente a la del número). Corregir en la v3 del dosier.",
       "titulo": "Elevation of serum creatinine in a renal transplant patient following oral creatine supplementation.",
       "revista": "Clin Kidney J",
       "pmid": "31384454",
@@ -788,7 +788,7 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -804,11 +804,11 @@
       "nivel_cita": "Nivel 4 · Observacionales, análisis de productos, análisis conjuntos y casos",
       "lectura": "resumen (Europe PMC)",
       "revista_fuera_de_pubmed": true,
-      "retractacion": "Sin avisos de corrección ni retractación en Crossref (consulta 23-11-2026, al preparar este archivo; no figura en el dosier v2).",
+      "retractacion": "Sin avisos de corrección ni retractación en Crossref (consulta 23-11-2026).",
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4. «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4. «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
@@ -826,7 +826,7 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "Autores con vínculos con Bang, Dymatize, Shifted y una marca británica.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": true
     },
     {
@@ -844,12 +844,11 @@
       "vinculos": "no consta",
       "vinculos_tipo": null,
       "vinculos_texto": "No consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
-      "id": "B7-DUIVEN",
-      "id_dosier": "B7",
+      "id": "B7a",
       "cita": "Duiven 2021",
       "autor": "Duiven E",
       "anio": 2021,
@@ -862,13 +861,12 @@
       "lectura": "resumen",
       "vinculos": "no consta",
       "vinculos_tipo": null,
-      "vinculos_texto": "Duiven: no consta.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
+      "vinculos_texto": "No consta.",
+      "vinculos_fuente": "Dosier, tabla 4 (ficha de PubMed). «No consta» no quiere decir independiente.",
       "apartar_en_sin_ellas": false
     },
     {
-      "id": "B7-BARKER",
-      "id_dosier": "B7",
+      "id": "B7b",
       "cita": "Barker 2025",
       "autor": "Barker L",
       "anio": 2025,
@@ -881,8 +879,8 @@
       "lectura": "resumen",
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
-      "vinculos_texto": "Barker: encargo público, sin conflictos.",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_texto": "Encargo público, sin conflictos.",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": false
     },
     {
@@ -900,13 +898,11 @@
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
       "vinculos_texto": "Kreider (preside el consejo asesor de Alzchem, investigación pagada por la industria, perito, cofundador de la ISSN); Bonilla (dirige KreaFood, consejo «Creatine for Health» de Alzchem, consultor de marcas).",
-      "vinculos_fuente": "Dosier v2, tabla 4 (declaraciones de la ficha de PubMed)",
+      "vinculos_fuente": "Dosier, tabla 4 (declaraciones de la ficha de PubMed)",
       "apartar_en_sin_ellas": true
     },
     {
-      "id": "SMITH-RYAN-2025",
-      "id_en_dosier": false,
-      "aviso": "El dosier la lista entre las revisiones narrativas de apoyo, sin id propio; el id es de este archivo.",
+      "id": "N1",
       "cita": "Smith-Ryan 2025",
       "autor": "Smith-Ryan AE",
       "anio": 2025,
@@ -919,14 +915,12 @@
       "lectura": "resumen",
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "autores",
-      "vinculos_texto": "Autoras asesoras de Alzchem.",
-      "vinculos_fuente": "Dosier v2, apartado 7 (frase 16) y 4 bis (Smith-Ryan en el consejo asesor de Alzchem)",
+      "vinculos_texto": "Autoras asesoras de Alzchem (Smith-Ryan, en su consejo asesor).",
+      "vinculos_fuente": "Dosier, tabla 4 (N1) y 4 bis",
       "apartar_en_sin_ellas": true
     },
     {
-      "id": "BUSQUEDA-2026-11-22",
-      "id_en_dosier": false,
-      "aviso": "El dosier la cita como «búsqueda del 22-11-2026 (apartado 2)», sin id propio; el id es de este archivo.",
+      "id": "S1",
       "cita": "Búsqueda en PubMed, 22-11-2026",
       "autor": "Verax Nutrition",
       "anio": 2026,
@@ -940,14 +934,12 @@
       "lectura": "no aplica",
       "vinculos": "sin vínculos conocidos",
       "vinculos_tipo": null,
-      "vinculos_texto": "Búsqueda propia, sin financiación de terceros. Verax se financia con comisiones de afiliación: ver nota 1, «Cómo se financia Verax».",
-      "vinculos_fuente": "Dosier v2, apartado 2",
+      "vinculos_texto": "Sin financiación de terceros. Verax se financia con comisiones de afiliación: ver nota 1, «Cómo se financia Verax».",
+      "vinculos_fuente": "Dosier, apartado 2 y tabla 4 (S1)",
       "apartar_en_sin_ellas": false
     },
     {
-      "id": "CREAPURE-WEB",
-      "id_en_dosier": false,
-      "aviso": "El dosier la cita en el apartado 2 y en la frase 26, sin id propio; el id es de este archivo.",
+      "id": "M1",
       "cita": "Creapure, «Quality & Manufacturing»",
       "autor": "Creapure (Alzchem)",
       "anio": null,
@@ -961,8 +953,8 @@
       "lectura": "página",
       "vinculos": "con financiación del sector",
       "vinculos_tipo": "marca",
-      "vinculos_texto": "Es la página de la propia marca, de Alzchem; sus datos son «declarados por la marca».",
-      "vinculos_fuente": "Dosier v2, apartado 2 y frase 26",
+      "vinculos_texto": "Es la propia marca (Alzchem, dueña de Creapure); sus datos son «declarados por la marca».",
+      "vinculos_fuente": "Dosier, apartado 2 y tabla 4 (M1)",
       "apartar_en_sin_ellas": true
     }
   ],
@@ -976,7 +968,7 @@
       "fuentes": ["O5", "O4"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P1 fuerza: se sostiene con el COI, el AIS y la EFSA; las dos fuentes de esta frase no tienen vínculos conocidos.",
+      "sin_ellas_por_que": "AIS y COI, sin vínculos conocidos.",
       "pendiente_verificar": false
     },
     {
@@ -989,7 +981,7 @@
       "fuentes": ["R1", "R2", "R23"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P1 fuerza: Wang H 2026 (63 estudios, sin conflictos) es el ancla independiente, con Lanhers 2015 y 2017 (no consta).",
+      "sin_ellas_por_que": "Wang H 2026 (63 estudios, sin conflictos); Lanhers 2015 y 2017, no consta.",
       "pendiente_verificar": false
     },
     {
@@ -1000,8 +992,8 @@
       "certeza_origen": "Apartado 6, P1: las cifras en kilos, baja",
       "fuentes": ["R5", "R6"],
       "fuentes_apartadas": ["R5", "R6"],
-      "sin_ellas": "sin evaluar",
-      "sin_ellas_por_que": "El 6 bis no evalúa las cifras en kilos. Las dos fuentes de la frase tienen autores con vínculos, así que sin ellas la frase se queda sin fuente.",
+      "sin_ellas": "se sostiene igual",
+      "sin_ellas_por_que": "La frase no afirma un efecto: avisa de que no hay una cifra fiable en kilos, y eso no favorece a quien vende. Sin R5 y R6 no queda ninguna cifra en kilos de fuentes sin vínculos, y las fuentes sin vínculos también discrepan en el tamaño del efecto.",
       "pendiente_verificar": false
     },
     {
@@ -1013,7 +1005,7 @@
       "fuentes": ["R4", "O4"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P1 sprints repetidos: sin fuentes con interés conocidas; se sostiene con Glaister 2022 y el COI.",
+      "sin_ellas_por_que": "Glaister 2022 (no consta) y el COI.",
       "pendiente_verificar": false
     },
     {
@@ -1025,8 +1017,7 @@
       "fuentes": ["R10", "R23", "E16", "R5"],
       "fuentes_apartadas": ["R10", "E16", "R5"],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P1 algo más de músculo: solo en parte; sin R10, R24 y E16 quedan R23 y R8 (sin conflictos), que dan más masa magra sin separar el agua. La certeza ya era baja y no baja más.",
-      "aviso": "Caso límite. Al apartar R10, E16 y R5, los matices de la frase («medido directamente, el efecto es muy pequeño», «parte es agua» y «solo 49 eran mujeres») se quedan sin su fuente, y R5 no figura en la fila del 6 bis. Lo tiene que decidir el dosier (v3).",
+      "sin_ellas_por_que": "La conclusión se sostiene con Wang H 2026 (sin conflictos). Los matices que la rebajan (muy pequeño medido directamente, parte es agua) van en contra del interés de quien vende, y Wang Z 2024 solo aporta el recuento de su muestra.",
       "pendiente_verificar": false
     },
     {
@@ -1038,7 +1029,7 @@
       "fuentes": ["R9", "E15", "O4"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P1 resistencia: sin fuentes con interés conocidas; se sostiene con R9, E15 y el COI.",
+      "sin_ellas_por_que": "Fernández-Landa 2023 (no consta), Barranco-Gil 2024 (sin conflictos) y el COI.",
       "pendiente_verificar": false
     },
     {
@@ -1050,7 +1041,7 @@
       "fuentes": ["E1"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P2 3 g/día: el interés es de la ISSN, que esta frase no cita; se sostiene con E1 y el COI.",
+      "sin_ellas_por_que": "Hultman 1996 (no consta).",
       "pendiente_verificar": false
     },
     {
@@ -1062,7 +1053,7 @@
       "fuentes": ["E1", "O7"],
       "fuentes_apartadas": ["O7"],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P2 3 g/día: sin la ISSN (O7) se sostiene con E1 y el COI.",
+      "sin_ellas_por_que": "Sin la ISSN se sostiene con Hultman 1996 (no consta).",
       "pendiente_verificar": false
     },
     {
@@ -1070,12 +1061,11 @@
       "bloque": "P2 · Dosis (ciencia general)",
       "texto": "Los consensos científicos describen una fase de carga de unos 20 g al día, repartidos en 4 tomas, durante 5 a 7 días, y después de 3 a 5 g al día.",
       "certeza": "Es bastante probable",
-      "certeza_origen": "El dosier no le da certeza propia (describe lo que dicen los consensos); se usa la de P2 dosis y saturación, moderada. Asignación del agente.",
+      "certeza_origen": "Apartado 6 bis, frase a frase: moderada (P2; frase descriptiva)",
       "fuentes": ["O4", "O6"],
       "fuentes_apartadas": ["O6"],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P2 3 g/día: sin la ISSN (O6) se sostiene con el COI, que describe la misma pauta.",
-      "aviso": "Sin O6 queda un solo consenso (el COI) y la frase dice «los consensos», en plural.",
+      "sin_ellas_por_que": "El consenso del COI describe la misma pauta. Sin la ISSN queda un consenso, no «los consensos» (propuesta de texto sin aplicar).",
       "pendiente_verificar": false
     },
     {
@@ -1087,7 +1077,7 @@
       "fuentes": ["E1"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P2 3 g/día: se sostiene con E1, sin interés conocido.",
+      "sin_ellas_por_que": "Hultman 1996 (no consta).",
       "pendiente_verificar": false
     },
     {
@@ -1099,7 +1089,7 @@
       "fuentes": ["E5"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P2 10 g de una vez: el interés es de la ISSN; se sostiene con E5.",
+      "sin_ellas_por_que": "Ostojic 2008 (no consta).",
       "pendiente_verificar": false
     },
     {
@@ -1111,7 +1101,7 @@
       "fuentes": ["R23", "R7"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P2 más dosis: se sostiene con R23 y R7, sin conflictos.",
+      "sin_ellas_por_que": "Wang H 2026 y Zhang 2025, sin conflictos.",
       "pendiente_verificar": false
     },
     {
@@ -1123,8 +1113,7 @@
       "fuentes": ["R5", "R14", "R15", "E14"],
       "fuentes_apartadas": ["R5"],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P3 mujeres jóvenes: sin fuentes con interés en la fila; se sostiene con R14, R15 y E14.",
-      "aviso": "La frase cita también R5 (Candow, vínculos con Alzchem según la tabla 4), que la fila del 6 bis no lista. Al apartarla, la primera frase («casi todo viene de estudios en hombres») pierde esa cita.",
+      "sin_ellas_por_que": "Tam 2025 y Lin 2026 (sin conflictos) y Forbes 2017 (no consta). Wang Z 2024 solo aporta un dato descriptivo (49 mujeres de 509).",
       "pendiente_verificar": false
     },
     {
@@ -1139,7 +1128,7 @@
           "texto": "Después de la menopausia, parece que la creatina no mejora la densidad del hueso, y es bastante probable: en los dos ensayos más largos (2 años, más de 400 mujeres en total, uno de ellos con 3 g al día), no la mejoró; un ensayo pequeño de un año vio que se perdía algo menos en la cadera.",
           "certeza": "Es bastante probable",
           "sin_ellas": "se sostiene igual",
-          "sin_ellas_por_que": "6 bis, P3 posmenopausia, hueso: sin E10 y E13 se sostiene con E11 y R18; además, el resultado nulo va en contra del interés de quien vende creatina."
+          "sin_ellas_por_que": "Sales 2020 (no consta) y Chen 2026 (sin conflictos); además, el resultado nulo va en contra del interés de quien vende."
         },
         {
           "parte": "fuerza",
@@ -1147,28 +1136,27 @@
           "certeza": "Faltan estudios",
           "sin_ellas": "se sostiene con menos certeza",
           "certeza_sin_ellas": "Faltan estudios",
-          "sin_ellas_por_que": "6 bis, P3 posmenopausia, fuerza: solo en parte; sin R17 y R16 quedan R18 (algo de fuerza de tren superior) y E10 y E11 (sin efecto). Bajó de moderada a baja, y la certeza publicada ya es la de sin ellas."
+          "sin_ellas_por_que": "Con todas las fuentes sería moderada; sin Naddafha 2026 quedan Chen 2026 (algo de fuerza de tren superior) y dos ensayos sin efecto: baja, que es la que ya dice el texto."
         }
       ],
       "fuentes": ["E10", "E11", "E12", "R18", "R17"],
       "fuentes_apartadas": ["E10", "R17"],
       "sin_ellas": "se sostiene con menos certeza",
       "certeza_sin_ellas": "Faltan estudios",
-      "sin_ellas_por_que": "6 bis: el hueso se sostiene igual; la fuerza, solo en parte, y bajó de moderada a baja, que es lo que ya dice el texto.",
-      "aviso": "En «Sin ellas», el hueso se sostiene gracias a E11 (Sales 2020), cuya financiación no consta y está pendiente de comprobar.",
+      "sin_ellas_por_que": "El hueso se sostiene igual; la fuerza, solo con certeza baja, que es la que ya dice el texto.",
       "pendiente_verificar": true,
-      "pendiente_motivo": "Financiación de Sales 2020 (E11) sin comprobar y registro NCT01472393 compartido con Lobo 2015 sin aclarar (dosier, apartado 9, pendientes)."
+      "pendiente_motivo": "Financiación de Sales 2020 (E11) sin comprobar y registro NCT01472393 compartido con Lobo 2015 sin aclarar. El hueso se sostiene sin las fuentes con vínculos gracias a E11."
     },
     {
       "numero": 15,
       "bloque": "P3 · Mujeres",
       "texto": "No hay ningún ensayo de creatina en mujeres embarazadas ni en lactancia; lo publicado son estudios en animales y estudios que observan cómo cambia la creatina del cuerpo durante el embarazo.",
       "certeza": "No se sabe",
-      "certeza_origen": "Apartado 6, P3 embarazo y lactancia: sin certeza GRADE (ausencia de estudios). «No se sabe» es la palabra de la escala para no tener estudios. Asignación del agente.",
-      "fuentes": ["BUSQUEDA-2026-11-22", "O7", "B1"],
+      "certeza_origen": "Apartado 6 bis, frase a frase: sin certeza (ausencia de estudios); en la escala, «No se sabe»",
+      "fuentes": ["S1", "O7", "B1"],
       "fuentes_apartadas": ["O7"],
-      "sin_ellas": "sin evaluar",
-      "sin_ellas_por_que": "El 6 bis no tiene fila para el embarazo ni la lactancia. Sin O7 (ISSN) quedan la búsqueda propia y B1 (no consta).",
+      "sin_ellas": "se sostiene igual",
+      "sin_ellas_por_que": "La búsqueda propia y de Guingand 2024 (no consta); además, es un límite de la evidencia.",
       "pendiente_verificar": false
     },
     {
@@ -1177,10 +1165,10 @@
       "texto": "Sobre la creatina en la perimenopausia y a lo largo del ciclo menstrual hay muy pocos estudios.",
       "certeza": "No se sabe",
       "certeza_origen": "Apartado 6, P3 ciclo menstrual y perimenopausia: muy baja",
-      "fuentes": ["SMITH-RYAN-2025", "R15"],
-      "fuentes_apartadas": ["SMITH-RYAN-2025"],
-      "sin_ellas": "sin evaluar",
-      "sin_ellas_por_que": "El 6 bis no tiene fila para la perimenopausia ni el ciclo. Sin Smith-Ryan 2025 (autoras asesoras de Alzchem) queda Lin 2026 (sin conflictos).",
+      "fuentes": ["N1", "R15"],
+      "fuentes_apartadas": ["N1"],
+      "sin_ellas": "se sostiene igual",
+      "sin_ellas_por_que": "Lin 2026 (sin conflictos); además, es un límite de la evidencia.",
       "pendiente_verificar": false
     },
     {
@@ -1192,7 +1180,7 @@
       "fuentes": ["R22", "R12"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P4 riñón: el interés es de la ISSN, que esta frase no cita; se sostiene con R22 y R12, sin conflictos.",
+      "sin_ellas_por_que": "de Souza Almeida 2026 y Naeini 2025, sin conflictos.",
       "pendiente_verificar": false
     },
     {
@@ -1204,7 +1192,7 @@
       "fuentes": ["R22", "R12", "B2"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P4 riñón: se sostiene con R22 y R12, sin conflictos; B2 no consta.",
+      "sin_ellas_por_que": "de Souza Almeida 2026 y Naeini 2025, sin conflictos; Law 2019, no consta.",
       "pendiente_verificar": false
     },
     {
@@ -1216,7 +1204,7 @@
       "fuentes": ["E3", "E4"],
       "fuentes_apartadas": ["E4"],
       "sin_ellas": "no se sostiene",
-      "sin_ellas_por_que": "6 bis, P4 pelo: sin E4 solo queda E3, que no midió el pelo.",
+      "sin_ellas_por_que": "Sin Lak 2025 solo queda un ensayo que no midió el pelo, y lo que aporta Lak 2025 (sin cambios en el pelo) favorece a quien vende.",
       "pendiente_verificar": true,
       "pendiente_motivo": "Registro previo de Lak 2025 (E4) sin comprobar (dosier, 4 ter y apartado 9)."
     },
@@ -1227,10 +1215,26 @@
       "nota_dosier": "Decisión de Natalia: opción B, sin hablar del peso.",
       "certeza": "Es bastante probable",
       "certeza_origen": "Apartado 6, P4 agua: moderada",
+      "partes": [
+        {
+          "parte": "al empezar",
+          "texto": "Al empezar, sobre todo con fase de carga, el músculo guarda algo más de agua.",
+          "certeza": "Es bastante probable",
+          "sin_ellas": "se sostiene igual",
+          "sin_ellas_por_que": "El COI y Glaister 2022 (no consta)."
+        },
+        {
+          "parte": "estudios largos",
+          "texto": "En estudios de varias semanas, esa agua ya no aumenta en proporción al músculo.",
+          "certeza": "Es bastante probable",
+          "sin_ellas": "no se sostiene",
+          "sin_ellas_por_que": "Solo lo dice la ISSN, con autores vinculados, y favorece a quien vende."
+        }
+      ],
       "fuentes": ["O4", "R4", "E16", "O7"],
       "fuentes_apartadas": ["E16", "O7"],
-      "sin_ellas": "sin evaluar",
-      "sin_ellas_por_que": "El 6 bis no tiene fila para el agua. Sin E16 y O7 quedan el COI y R4 (no consta) para la primera parte; la segunda («esa agua ya no aumenta») solo la citaba O7.",
+      "sin_ellas": "no se sostiene",
+      "sin_ellas_por_que": "No se sostiene la segunda parte: solo la dice la ISSN y favorece a quien vende. La primera se sostiene con el COI y Glaister 2022.",
       "pendiente_verificar": false
     },
     {
@@ -1242,7 +1246,7 @@
       "fuentes": ["B8", "E5", "O7"],
       "fuentes_apartadas": ["B8", "O7"],
       "sin_ellas": "no se sostiene",
-      "sin_ellas_por_que": "6 bis, P4 efectos secundarios: no hay fuentes independientes leídas, salvo E5, que solo mira las molestias digestivas.",
+      "sin_ellas_por_que": "No hay fuentes independientes leídas, salvo Ostojic 2008, que solo mira las molestias digestivas con 10 g de una vez.",
       "pendiente_verificar": false
     },
     {
@@ -1254,8 +1258,8 @@
       "certeza_origen": "Apartado 6, P4 grupos de riesgo: muy baja",
       "fuentes": ["R22", "R12", "O6"],
       "fuentes_apartadas": ["O6"],
-      "sin_ellas": "sin evaluar",
-      "sin_ellas_por_que": "El 6 bis no tiene fila para los grupos de riesgo. Sin O6 quedan R22 y R12 (sin conflictos) para la primera parte; el aviso de prudencia no depende de ninguna fuente.",
+      "sin_ellas": "se sostiene igual",
+      "sin_ellas_por_que": "de Souza Almeida 2026 y Naeini 2025 (sin conflictos) para el riñón y la búsqueda propia para el embarazo; el resto es un límite de la evidencia. El aviso de prudencia no depende de ninguna fuente.",
       "pendiente_verificar": false
     },
     {
@@ -1265,9 +1269,9 @@
       "certeza": "Es bastante probable",
       "certeza_origen": "Apartado 6, P5 formas: moderada",
       "fuentes": ["R19", "E8", "E6", "E9"],
-      "fuentes_apartadas": [],
+      "fuentes_apartadas": ["E6"],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P5 formas: sí, con una contradicción: R19, E6 (contra el interés del donante) y E8 lo dicen; E9 dice lo contrario.",
+      "sin_ellas_por_que": "Fazio 2022 (no consta) y Eghbali 2024 (sin conflictos); además, Spillane 2009 va en contra de quien donó el etiléster.",
       "pendiente_verificar": false
     },
     {
@@ -1275,23 +1279,23 @@
       "bloque": "P5 · Formas y pureza",
       "texto": "El etiléster de creatina se convierte en parte en creatinina: en un ensayo dejó menos creatina en sangre que el monohidrato. Ese estudio recibió el etiléster de quien lo vendía, y aun así salió peor.",
       "certeza": "Es bastante probable",
-      "certeza_origen": "El dosier no le da certeza propia; se usa la de P5 formas, moderada. Asignación del agente.",
+      "certeza_origen": "Apartado 6 bis, frase a frase: moderada (P5)",
       "fuentes": ["E6", "B2"],
-      "fuentes_apartadas": [],
+      "fuentes_apartadas": ["E6"],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P5 formas: E6 va en contra del interés de quien donó el etiléster y el dosier lo cuenta entre las fuentes que sostienen la conclusión, así que no se aparta.",
+      "sin_ellas_por_que": "El resultado de Spillane 2009 va en contra de quien donó el etiléster; Law 2019 apunta en la misma dirección.",
       "pendiente_verificar": false
     },
     {
       "numero": 25,
       "bloque": "P5 · Formas y pureza",
       "texto": "La creatina \"tamponada\" (Kre-Alkalyn), a la dosis de su etiqueta, no funcionó mejor que el monohidrato. Ese estudio lo pagó Alzchem, que fabrica monohidrato.",
-      "certeza": "Es bastante probable",
-      "certeza_origen": "El dosier no le da certeza propia; se usa la de P5 formas, moderada. Asignación del agente.",
+      "certeza": "Faltan estudios",
+      "certeza_origen": "Apartado 6 bis, frase a frase: baja (un solo ensayo; nueva en la v3)",
       "fuentes": ["E7"],
       "fuentes_apartadas": ["E7"],
-      "sin_ellas": "sin evaluar",
-      "sin_ellas_por_que": "El 6 bis evalúa las formas en conjunto (frase 23), no la tamponada. Su única fuente (E7) la pagó Alzchem y se aparta: sin ella la frase se queda sin fuente.",
+      "sin_ellas": "no se sostiene",
+      "sin_ellas_por_que": "Su única fuente la pagó Alzchem, que fabrica el monohidrato con el que se compara, y el resultado le favorece. La conclusión general sobre las formas (frase 23) sí se sostiene.",
       "pendiente_verificar": false
     },
     {
@@ -1300,10 +1304,10 @@
       "texto": "No hay ningún estudio que compare el efecto de Creapure con el de otro monohidrato. Lo que la marca declara es pureza y fabricación controlada, no que funcione mejor.",
       "certeza": "No se sabe",
       "certeza_origen": "Apartado 6, P5 Creapure frente a monohidrato genérico: muy baja (no hay estudios)",
-      "fuentes": ["BUSQUEDA-2026-11-22", "CREAPURE-WEB"],
-      "fuentes_apartadas": ["CREAPURE-WEB"],
+      "fuentes": ["S1", "M1"],
+      "fuentes_apartadas": ["M1"],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P5 Creapure: no hay estudios de efecto; la frase lo dice con la búsqueda propia y la pureza solo se presenta como «declarada por la marca».",
+      "sin_ellas_por_que": "«No hay ningún estudio» sale de la búsqueda propia. La web de la marca solo se cita para decir lo que declara la marca.",
       "pendiente_verificar": false
     },
     {
@@ -1314,20 +1318,20 @@
       "certeza_origen": "Apartado 6, P5 pureza: baja",
       "fuentes": ["B3"],
       "fuentes_apartadas": [],
-      "sin_ellas": "sin evaluar",
-      "sin_ellas_por_que": "El 6 bis no tiene fila para la pureza. Su única fuente (B3) no tiene vínculos conocidos (no consta), así que el botón no la cambia.",
+      "sin_ellas": "se sostiene igual",
+      "sin_ellas_por_que": "Moret 2011 no tiene vínculos conocidos (no consta); Crossref, 23-11-2026: sin avisos de corrección ni retractación.",
       "pendiente_verificar": false
     },
     {
       "numero": 28,
       "bloque": "P5 · Formas y pureza",
       "texto": "Por gramo, las formas distintas del monohidrato suelen costar más: en Amazon (EE. UU.), el doble de media.",
-      "certeza": null,
-      "certeza_origen": "El dosier no le da certeza: es un dato de precios de un solo análisis del mercado, no una conclusión del apartado 6.",
+      "certeza": "Faltan estudios",
+      "certeza_origen": "Apartado 6 bis, frase a frase: baja (un solo análisis, de un mercado y de 2022, con autores vinculados; nueva en la v3)",
       "fuentes": ["B5"],
       "fuentes_apartadas": ["B5"],
-      "sin_ellas": "sin evaluar",
-      "sin_ellas_por_que": "El 6 bis no tiene fila para los precios. Su única fuente (B5) tiene autores con vínculos con marcas y se aparta: sin ella la frase se queda sin fuente.",
+      "sin_ellas": "no se sostiene",
+      "sin_ellas_por_que": "Su única fuente tiene autores vinculados con marcas, y no se ha comprobado si esas marcas ganan o pierden con el resultado. Sin ella no queda fuente.",
       "pendiente_verificar": false
     },
     {
@@ -1339,7 +1343,7 @@
       "fuentes": ["B6"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P6 contaminación: se sostiene con B6, B7, R20, R21 y el COI.",
+      "sin_ellas_por_que": "Geyer 2004 (no consta).",
       "pendiente_verificar": false
     },
     {
@@ -1349,10 +1353,10 @@
       "nota_dosier": "Decisión de Natalia: la categoría tal cual, como aviso de riesgo, nunca como recomendación.",
       "certeza": "Es bastante probable",
       "certeza_origen": "Apartado 6, P6 contaminación: moderada para los suplementos en general (muy baja para la creatina en concreto)",
-      "fuentes": ["B7-DUIVEN", "B7-BARKER"],
+      "fuentes": ["B7a", "B7b"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P6 contaminación: se sostiene con B6, B7, R20, R21 y el COI.",
+      "sin_ellas_por_que": "Duiven 2021 (no consta) y Barker 2025 (sin conflictos).",
       "pendiente_verificar": false
     },
     {
@@ -1364,7 +1368,7 @@
       "fuentes": ["O4"],
       "fuentes_apartadas": [],
       "sin_ellas": "se sostiene igual",
-      "sin_ellas_por_que": "6 bis, P6 sellos: los sellos patrocinan la ISSN, que esta frase no cita; «sin eliminarlo» y «reducen el riesgo» se sostienen con el COI.",
+      "sin_ellas_por_que": "El COI, sin conflictos. Los sellos patrocinan la ISSN, que la frase no cita.",
       "pendiente_verificar": true,
       "pendiente_motivo": "La web de Informed Sport no cargó el 22-11-2026 (dosier, apartado 2) y la frase la nombra."
     }

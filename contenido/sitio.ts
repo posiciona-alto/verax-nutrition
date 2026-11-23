@@ -14,11 +14,14 @@ export const sitio = {
   revisado: "[fecha]",
 };
 
+/** Ruta de la calculadora de creatina (arquitectura y UX, 22-11-2026). */
+export const RUTA_CALCULADORA = "/calculadoras/dosis-creatina/";
+
 export const menu = [
   { texto: "Objetivos", href: "/#objetivos" },
   { texto: "Suplementos", href: "/#suplementos" },
   { texto: "Comparar", href: "/comparar/creatina/" },
-  { texto: "Calculadoras", href: "/calculadoras/creatina/" },
+  { texto: "Calculadoras", href: RUTA_CALCULADORA },
   { texto: "Quién pagó el estudio", href: "/#quien-pago" },
 ];
 

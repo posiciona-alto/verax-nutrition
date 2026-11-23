@@ -24,7 +24,7 @@ export const resumen: { titulo: string; frases: UsoFrase[]; enlace?: { texto: st
   {
     titulo: "¿Hace falta la fase de carga?",
     frases: [u(8, { certeza: "Es bastante probable" }), u(12, { certeza: "Faltan estudios" })],
-    enlace: { texto: "cuánta creatina tomar", href: "/calculadoras/creatina/" },
+    enlace: { texto: "cuánta creatina tomar", href: "/calculadoras/dosis-creatina/" },
   },
   {
     titulo: "El mito: ¿hace caer el pelo?",
@@ -52,7 +52,7 @@ export const secciones: Seccion[] = [
   {
     id: "cuanta",
     titulo: "Cuánta se toma",
-    parrafos: [{ frases: [u(7), u(8), u(12)], enlace: { texto: "cuánta creatina tomar", href: "/calculadoras/creatina/" } }],
+    parrafos: [{ frases: [u(7), u(8), u(12)], enlace: { texto: "cuánta creatina tomar", href: "/calculadoras/dosis-creatina/" } }],
   },
   {
     id: "mujeres",
@@ -102,3 +102,14 @@ export const textos = {
   proximaRevision: "Próxima revisión: mayo de 2027",
   sanitaria: "Esta página informa y no sustituye a un profesional sanitario.",
 };
+
+/** Los números de las frases del dosier que salen en la ficha, sin repetir. */
+export function frasesDeLaFicha(): number[] {
+  const usos = [
+    ...resumen.flatMap((r) => r.frases),
+    ...secciones.flatMap((s) => s.parrafos.flatMap((p) => p.frases)),
+    ...seguridad.flatMap((s) => s.frases),
+    ...formas.parrafos.flatMap((p) => p.frases),
+  ];
+  return [...new Set(usos.map((x) => x.n))];
+}

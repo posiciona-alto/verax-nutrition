@@ -21,9 +21,9 @@ export const metadata: Metadata = {
 
 export default function CompararCreatina() {
   const num = new Numerador();
-  const n29 = num.siguiente();
-  const n31 = num.siguiente();
-  const nDecl = num.siguiente();
+  const n29 = num.deFrase(29).n;
+  const n31 = num.deFrase(31).n;
+  const nDecl = num.deFuentes(["O1"]).n;
   const d = evidenciaCreatina.declaracion_autorizada;
   const segundaDe22 = "Si tienes alguna enfermedad, estás embarazada o das el pecho, o tomas medicación, consúltalo antes con tu médico.";
 
@@ -31,7 +31,7 @@ export default function CompararCreatina() {
     <>
       {MODO_CONCEPTO && datosEnBorrador ? <BandaBorrador /> : null}
       <Cabecera actual="/comparar/creatina/" />
-      <main id="contenido" className="con-notas reticula">
+      <main id="contenido" className="con-notas con-barra reticula">
         <div className="pt-6 md:pt-10">
           <Migas items={[{ texto: "Inicio", href: "/" }, { texto: "Comparar", href: "/#comparar" }, { texto: "Creatina" }]} />
           <Fila
@@ -44,7 +44,11 @@ export default function CompararCreatina() {
                 </p>
               </>
             }
-            notas={<NotaUno texto={notaUno.comparador} />}
+            notas={
+              <div className="solo-escritorio">
+                <NotaUno texto={notaUno.comparador} />
+              </div>
+            }
           />
         </div>
 
@@ -52,7 +56,7 @@ export default function CompararCreatina() {
           className="mt-8"
           texto={
             <div className="space-y-3">
-              <p className="aviso-afiliacion">
+              <p className="aviso-afiliacion solo-movil">
                 {notaUno.comparador} <Link href="/como-se-financia/">Cómo se financia<span className="llamada-texto">1</span>&nbsp;→</Link>
               </p>
               <p>{segundaDe22}</p>

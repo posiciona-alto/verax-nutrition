@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: `${H1} | Verax`,
   description:
     "La cifra de la declaración autorizada, la de los consensos y la cuenta de tu bote: cuántos días te dura y cuánto te cuesta cada dosis. Sin pedirte el peso.",
-  alternates: { canonical: "/calculadoras/creatina/" },
+  alternates: { canonical: "/calculadoras/dosis-creatina/" },
 };
 
 /** Lo que usan los estudios (7 ter, parte 1): frases 9, 7, 8, 12 y 11, con su certeza. */
@@ -23,14 +23,14 @@ const ESTUDIOS = [9, 7, 8, 12, 11];
 export default function CalculadoraCreatina() {
   const num = new Numerador();
   const d = evidenciaCreatina.declaracion_autorizada;
-  const nNorma = num.siguiente();
-  const estudios = ESTUDIOS.map((n) => ({ n, nota: num.siguiente() }));
-  const nAviso = num.siguiente();
+  const nNorma = num.deFuentes(["O1"]).n;
+  const estudios = ESTUDIOS.map((n) => ({ n, nota: num.deFrase(n).n }));
+  const nAviso = num.deFrase(22).n;
 
   return (
     <>
       {MODO_CONCEPTO && datosEnBorrador ? <BandaBorrador /> : null}
-      <Cabecera actual="/calculadoras/creatina/" />
+      <Cabecera actual="/calculadoras/dosis-creatina/" />
       <main id="contenido" className="con-notas reticula">
         <div className="pt-6 md:pt-10">
           <Migas items={[{ texto: "Inicio", href: "/" }, { texto: "Calculadoras", href: "/#calculadoras" }, { texto: "Creatina" }]} />
@@ -110,30 +110,26 @@ export default function CalculadoraCreatina() {
           <Calculadora />
         </section>
 
-        <section aria-labelledby="antes" className="seccion-cerca salud">
+        <section aria-labelledby="antes" className="seccion salud">
           <h2 id="antes" className="t-h2 h-seccion">
             Antes de empezar
           </h2>
           <Fila
             texto={
-              <p>
-                <TextoFrase n={nAviso} uso={{ n: 22 }} />
-              </p>
+              <>
+                <p>
+                  <TextoFrase n={nAviso} uso={{ n: 22 }} />
+                </p>
+                <p className="mt-4">
+                  Esta calculadora no te da una dosis para tu caso. Para tu caso concreto, lo mejor es que lo veas con un
+                  dietista-nutricionista.
+                </p>
+              </>
             }
             notas={<NotaFrase n={nAviso} uso={{ n: 22 }} />}
           />
         </section>
 
-        <section aria-labelledby="no-hace" className="seccion">
-          <h2 id="no-hace" className="t-h2 h-seccion">
-            Lo que no hace esta calculadora
-          </h2>
-          <Fila
-            texto={
-              <p>No te da una dosis para tu caso. Para tu caso concreto, lo mejor es que lo veas con un dietista-nutricionista.</p>
-            }
-          />
-        </section>
         <EstilosLlamadas usados={num.usados} />
       </main>
       <NotasMovil />

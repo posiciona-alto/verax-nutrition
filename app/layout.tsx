@@ -38,14 +38,18 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-/** «Firma»: el ¹ del logotipo llega el último, una vez por sesión y solo en la portada (movimiento-v1, 3.5). */
-const FIRMA = `try{if(location.pathname==="/"&&!sessionStorage.getItem("vx-firma")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("firma");sessionStorage.setItem("vx-firma","1")}}catch(e){}`;
+/**
+ * «Firma»: el ¹ del logotipo llega el último, una vez por sesión y solo en la primera carga de la portada
+ * (movimiento-v1, 3.5). La clase se quita al acabar, para que navegar dentro de la web no la repita.
+ * «js-notas» se pone antes de pintar: en el móvil las notas cerradas no aparecen y desaparecen al cargar.
+ */
+const ANTES_DE_PINTAR = `(function(){var r=document.documentElement;r.classList.add("js-notas");try{if(location.pathname==="/"&&!sessionStorage.getItem("vx-firma")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){r.classList.add("firma");sessionStorage.setItem("vx-firma","1");setTimeout(function(){r.classList.remove("firma")},900)}}catch(e){}})()`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es" className={`${fraunces.variable} ${newsreader.variable} ${archivo.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: FIRMA }} />
+        <script dangerouslySetInnerHTML={{ __html: ANTES_DE_PINTAR }} />
       </head>
       <body>{children}</body>
     </html>

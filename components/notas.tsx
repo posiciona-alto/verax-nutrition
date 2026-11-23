@@ -1,48 +1,75 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { CircleQuestionMark, CornerDownLeft, Link as IconoVinculo, Unlink } from "lucide-react";
+import { CircleQuestionMark, Link as IconoVinculo, Unlink } from "lucide-react";
 import type { UsoFrase } from "@/contenido/creatina/ficha";
 import { enlaceDe, frase as fraseDe, fuente as fuenteDe, plegadaDe, vinculosDe, type FraseDatos } from "@/lib/evidencia";
 
-/** Numera las notas de una página en el orden en que se escriben: la 1 es siempre la de Verax. */
+export type RegistroNota = { n: number; ids: string[]; frase?: number };
+
+/**
+ * Numera las notas de una página: la 1 es siempre la de Verax y cada frase (o cada grupo de fuentes) tiene un solo
+ * número en toda la página. Si una frase sale dos veces, la segunda lleva el mismo número.
+ */
 export class Numerador {
   private n = 1;
+  private porClave = new Map<string, number>();
   usados: number[] = [1];
-  siguiente() {
+  registro: RegistroNota[] = [];
+
+  private nuevo(clave: string, ids: string[], frase?: number) {
     this.n += 1;
     this.usados.push(this.n);
+    this.porClave.set(clave, this.n);
+    this.registro.push({ n: this.n, ids, frase });
     return this.n;
+  }
+
+  /** Número de una frase del dosier y si es la primera vez que sale en la página. */
+  deFrase(numero: number): { n: number; primera: boolean } {
+    const ya = this.porClave.get(`f${numero}`);
+    if (ya) return { n: ya, primera: false };
+    return { n: this.nuevo(`f${numero}`, ordenFuentes(fraseDe(numero)), numero), primera: true };
+  }
+
+  /** Número de un grupo de fuentes sueltas (normas, organismos). */
+  deFuentes(ids: string[]): { n: number; primera: boolean } {
+    const clave = `g${ids.join(",")}`;
+    const ya = this.porClave.get(clave);
+    if (ya) return { n: ya, primera: false };
+    return { n: this.nuevo(clave, ids), primera: true };
   }
 }
 
-export function Llamada({ n }: { n: number }) {
+/** Las fuentes apartadas van primero en su nota: así la señal de «Sin ellas» cae a la altura de la frase. */
+function ordenFuentes(d: FraseDatos) {
+  return [...d.fuentes_apartadas.filter((id) => d.fuentes.includes(id)), ...d.fuentes.filter((id) => !d.fuentes_apartadas.includes(id))];
+}
+
+export function Llamada({ n, primera = true, apartadas }: { n: number; primera?: boolean; apartadas?: boolean }) {
   return (
-    <a className="llamada" href={`#nota-${n}`} id={`llamada-${n}`} data-n={n} aria-controls={`nota-${n}`}>
+    <a className="llamada" href={`#nota-${n}`} id={primera ? `llamada-${n}` : undefined} data-n={n} data-repetida={primera ? undefined : ""}>
       <span className="sr-only">Nota </span>
       {n}
+      {apartadas ? <span className="sr-solo-sin-ellas">, con fuentes apartadas en esta prueba</span> : null}
     </a>
   );
 }
 
-export function Nota({ n, children, uno, volver = true }: { n: number; children: ReactNode; uno?: boolean; volver?: boolean }) {
+export function Nota({ n, children, uno, id }: { n: number; children: ReactNode; uno?: boolean; id?: string }) {
   return (
-    <div className={`nota${uno ? " nota-uno" : ""}`} id={`nota-${n}`} data-n={n} role="note" tabIndex={-1}>
+    <div className={`nota${uno ? " nota-uno" : ""}`} id={id ?? `nota-${n}`} data-n={n} role="note" tabIndex={-1}>
       <div className="nota-cabeza">
-        <span className="nota-num" aria-hidden="true">
-          {n}
-        </span>
-        <span className="sr-only">Nota {n}. </span>
-        <div className="nota-cuerpo">
-          {children}
-          {volver ? (
-            <>
-              {" "}
-              <a className="nota-volver" href={`#llamada-${n}`} aria-label={`Volver al texto de la nota ${n}`}>
-                <CornerDownLeft size={14} strokeWidth={1.75} aria-hidden="true" />
-              </a>
-            </>
-          ) : null}
-        </div>
+        {uno ? (
+          <span className="nota-num" aria-hidden="true">
+            {n}
+          </span>
+        ) : (
+          <a className="nota-num" href={`#fuentes-${n}`} aria-label={`Nota ${n}: ver sus fuentes completas`}>
+            {n}
+          </a>
+        )}
+        {uno ? <span className="sr-only">Nota {n}. </span> : null}
+        <div className="nota-cuerpo">{children}</div>
         <span className="nota-filete" aria-hidden="true" />
       </div>
     </div>
@@ -50,32 +77,41 @@ export function Nota({ n, children, uno, volver = true }: { n: number; children:
 }
 
 /** La nota 1: cómo se financia Verax. En el móvil va siempre abierta. */
-export function NotaUno({ texto, enlace = true }: { texto: string; enlace?: boolean }) {
+export function NotaUno({ texto, enlace = true, grande }: { texto: string; enlace?: boolean; grande?: boolean }) {
   return (
-    <Nota n={1} uno volver={false}>
-      {texto}{" "}
-      {enlace ? <Link href="/como-se-financia/">Cómo se financia&nbsp;→</Link> : null}
-    </Nota>
+    <div className={grande ? "nota-uno-grande" : undefined}>
+      <Nota n={1} uno>
+        {texto} {enlace ? <Link href="/como-se-financia/">Cómo se financia&nbsp;→</Link> : null}
+      </Nota>
+    </div>
   );
 }
 
-export function MarcaPago({ id }: { id: string }) {
+function IconoPago({ id }: { id: string }) {
+  const v = vinculosDe(fuenteDe(id));
+  if (v === "sin") return <Unlink size={14} strokeWidth={1.75} aria-hidden="true" />;
+  if (v === "con") return <IconoVinculo size={14} strokeWidth={1.75} aria-hidden="true" />;
+  return <CircleQuestionMark size={14} strokeWidth={1.75} aria-hidden="true" />;
+}
+
+function etiquetaPago(id: string) {
   const f = fuenteDe(id);
+  if (f.tipo === "búsqueda propia") return "Búsqueda propia";
+  if (f.tipo === "norma") return "Norma de la UE";
   const v = vinculosDe(f);
-  if (f.tipo === "búsqueda propia") return <span className="pago-detalle">Búsqueda propia</span>;
-  if (f.tipo === "norma") return <span className="pago-detalle">Norma de la UE</span>;
+  return v === "sin" ? "Sin vínculos conocidos" : v === "con" ? "Con financiación o vínculos del sector" : "No consta";
+}
+
+/** Marca de quién paga, corta: icono y palabras. El detalle está en «En qué se basa». */
+export function MarcaPago({ id, detalle }: { id: string; detalle?: boolean }) {
+  const f = fuenteDe(id);
+  const propia = f.tipo === "búsqueda propia" || f.tipo === "norma";
   return (
     <span className="pago">
-      {v === "sin" ? (
-        <Unlink size={14} strokeWidth={1.75} aria-hidden="true" />
-      ) : v === "con" ? (
-        <IconoVinculo size={14} strokeWidth={1.75} aria-hidden="true" />
-      ) : (
-        <CircleQuestionMark size={14} strokeWidth={1.75} aria-hidden="true" />
-      )}
+      {propia ? null : <IconoPago id={id} />}
       <span>
-        {v === "sin" ? "Sin vínculos conocidos" : v === "con" ? "Con financiación o vínculos del sector" : "No consta"}
-        {v === "con" ? <span className="pago-detalle">. {f.vinculos_texto}</span> : null}
+        {etiquetaPago(id)}
+        {detalle && vinculosDe(f) === "con" ? <span className="pago-detalle">. {f.vinculos_texto}</span> : null}
       </span>
     </span>
   );
@@ -83,24 +119,15 @@ export function MarcaPago({ id }: { id: string }) {
 
 function LineaFuente({ id, apartable, senal }: { id: string; apartable: boolean; senal?: string | null }) {
   const f = fuenteDe(id);
-  const enlace = enlaceDe(f);
   return (
     <li className="fuente" data-vinculos={apartable ? "con" : "no"}>
       <div className="capa capa-completa">
         <span className="fuente-cita">{f.cita}</span>
-        {enlace ? (
-          <>
-            {" · "}
-            <a href={enlace.href} rel="noopener" className="t-secundario">
-              {enlace.texto}
-            </a>
-          </>
-        ) : null}
-        <br />
+        <span aria-hidden="true"> · </span>
         <MarcaPago id={id} />
       </div>
       {apartable ? (
-        <div className="capa capa-plegada" aria-hidden="true">
+        <div className="capa capa-plegada">
           {senal ? <span className="senal-margen">{senal}</span> : null}
           Apartada en esta prueba · {plegadaDe(f)}
         </div>
@@ -109,31 +136,46 @@ function LineaFuente({ id, apartable, senal }: { id: string; apartable: boolean;
   );
 }
 
-function senalDe(d: FraseDatos): string | null {
+export function senalDe(d: FraseDatos): string | null {
   if (d.sin_ellas === "no se sostiene") return "Sin ellas, esto no se sostiene";
   if (d.sin_ellas === "se sostiene con menos certeza")
     return `Sin ellas, se sostiene con menos certeza${d.certeza_sin_ellas ? `: «${d.certeza_sin_ellas}»` : ""}`;
   return null;
 }
 
-/** La nota de una frase: sus fuentes, cada una con su marca de quién paga, y lo que pasa con «Sin ellas». */
-export function NotaFrase({ n, uso, sensibilidad }: { n: number; uso: UsoFrase; sensibilidad?: { marca: string; explica: string } }) {
+/** La nota de una frase: sus fuentes en una línea cada una, y lo que pasa con «Sin ellas». */
+export function NotaFrase({
+  n,
+  uso,
+  primera = true,
+  sensibilidad,
+}: {
+  n: number;
+  uso: UsoFrase;
+  primera?: boolean;
+  sensibilidad?: { marca: string; explica: string };
+}) {
+  if (!primera) {
+    return (
+      <Nota n={n} id={`nota-${n}-repetida`}>
+        <a href={`#nota-${n}`} className="nota-repetida">
+          Sus fuentes, en la nota {n} de arriba&nbsp;↑
+        </a>
+      </Nota>
+    );
+  }
   const d = fraseDe(uso.n);
   const senal = senalDe(d);
+  const ids = ordenFuentes(d);
   return (
     <Nota n={n}>
       {d.sin_ellas === "sin evaluar" ? <p className="sin-evaluar">Sin evaluar en esta prueba</p> : null}
       <ul className="fuentes">
-        {d.fuentes.map((id) => (
-          <LineaFuente
-            key={id}
-            id={id}
-            apartable={d.fuentes_apartadas.includes(id)}
-            senal={id === d.fuentes_apartadas[0] ? senal : null}
-          />
+        {ids.map((id, i) => (
+          <LineaFuente key={id} id={id} apartable={d.fuentes_apartadas.includes(id)} senal={i === 0 ? senal : null} />
         ))}
       </ul>
-      {d.pendiente_verificar ? <p className="pendiente mt-2">[Antes de publicar: {d.pendiente_motivo}]</p> : null}
+      {d.pendiente_verificar ? <p className="pendiente mt-1">[Pendiente de comprobar antes de publicar]</p> : null}
       {uso.sensibilidad && sensibilidad ? (
         <details className="marca-sensibilidad">
           <summary>
@@ -150,7 +192,7 @@ export function NotaFrase({ n, uso, sensibilidad }: { n: number; uso: UsoFrase; 
 }
 
 /** El texto de una frase, con su llamada. La señal para el móvil y el lector de pantalla va dentro, oculta hasta «Sin ellas». */
-export function TextoFrase({ n, uso, conCerteza }: { n: number; uso: UsoFrase; conCerteza?: boolean }) {
+export function TextoFrase({ n, uso, primera = true }: { n: number; uso: UsoFrase; primera?: boolean }) {
   const d = fraseDe(uso.n);
   const senal = senalDe(d);
   const estado =
@@ -158,10 +200,61 @@ export function TextoFrase({ n, uso, conCerteza }: { n: number; uso: UsoFrase; c
   return (
     <span className="frase" data-se-sostiene={estado} data-frase={uso.n}>
       {senal ? <span className="senal-texto">{senal}: </span> : null}
-      {conCerteza && uso.certeza ? <span className="certeza">{uso.certeza}. </span> : null}
       <span className="frase-texto">{uso.texto ?? d.texto}</span>
-      <Llamada n={n} />{" "}
+      <Llamada n={n} primera={primera} apartadas={d.fuentes_apartadas.length > 0} />{" "}
     </span>
+  );
+}
+
+/** Una nota con fuentes sueltas (no ligadas a una frase del dosier): normas, organismos. */
+export function NotaFuentes({ n, ids, antes }: { n: number; ids: string[]; antes?: ReactNode }) {
+  return (
+    <Nota n={n}>
+      {antes}
+      <ul className="fuentes">
+        {ids.map((id) => (
+          <LineaFuente key={id} id={id} apartable={false} />
+        ))}
+      </ul>
+    </Nota>
+  );
+}
+
+/** «En qué se basa»: cada número del margen, con sus fuentes completas. Los números coinciden uno a uno. */
+export function ListaNotas({ registro }: { registro: RegistroNota[] }) {
+  return (
+    <ol className="lista-notas mt-4 t-nota">
+      {registro.map((r) => (
+        <li key={r.n} id={`fuentes-${r.n}`} tabIndex={-1}>
+          <span className="lista-num">{r.n}</span>
+          <ul className="lista-fuentes">
+            {r.ids.map((id) => {
+              const f = fuenteDe(id);
+              const enlace = enlaceDe(f);
+              return (
+                <li key={id}>
+                  <span className="fuente-cita">{f.cita}</span>
+                  {f.revista ? <em>, {f.revista}</em> : null} · {f.tipo}
+                  {enlace ? (
+                    <>
+                      {" · "}
+                      <a href={enlace.href} rel="noopener">
+                        {enlace.texto}
+                      </a>
+                    </>
+                  ) : null}
+                  <br />
+                  <MarcaPago id={id} detalle />
+                </li>
+              );
+            })}
+          </ul>
+          <a href={`#nota-${r.n}`} className="t-secundario" aria-label={`Volver a la nota ${r.n}`}>
+            ↑
+          </a>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -179,25 +272,13 @@ export function EstilosLlamadas({ usados }: { usados: number[] }) {
         `.con-notas:has(.llamada[data-n="${n}"]:hover) .nota[data-n="${n}"] .nota-filete{transform:scaleX(1);transition:transform var(--mov-llamada) var(--curva-salida)}.con-notas:has(.nota[data-n="${n}"]:hover) .llamada[data-n="${n}"]::after{transform:scaleX(1);transition:transform var(--mov-llamada) var(--curva-salida)}`,
     )
     .join("");
+  /* En las partes de salud, la llamada va en seco (movimiento-v1, 3.1). */
+  const salud = `.salud .nota-filete,.salud .llamada::after,.con-notas .salud .nota-filete,.con-notas .salud .llamada::after{transition:none!important}`;
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: `@media (min-width:900px){${enfoque}}@media (min-width:900px) and (hover:hover) and (pointer:fine){${raton}}`,
+        __html: `@media (min-width:900px){${enfoque}}@media (min-width:900px) and (hover:hover) and (pointer:fine){${raton}}${salud}`,
       }}
     />
-  );
-}
-
-/** Una nota con fuentes sueltas (no ligadas a una frase del dosier): normas, organismos, la línea del 6 bis. */
-export function NotaFuentes({ n, ids, antes }: { n: number; ids: string[]; antes?: ReactNode }) {
-  return (
-    <Nota n={n}>
-      {antes}
-      <ul className="fuentes">
-        {ids.map((id) => (
-          <LineaFuente key={id} id={id} apartable={false} />
-        ))}
-      </ul>
-    </Nota>
   );
 }

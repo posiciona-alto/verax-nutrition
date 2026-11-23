@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { ExternalLink, SlidersHorizontal } from "lucide-react";
 import type { Dato, ProductoEjemplo } from "@/contenido/comparar/creatina-ejemplo";
@@ -64,11 +64,41 @@ export function Comparador({ productos, afiliado, avisoCreapure, avisoSellos }: 
   const [borrador, setBorrador] = useState<Filtros>(SIN_FILTROS);
   const hoja = useRef<HTMLDialogElement>(null);
 
+  const lista = useRef<HTMLOListElement>(null);
+  const transicion = useRef<{ skipTransition: () => void } | null>(null);
+
+  /** «Base»: solo los cuadros que están a la vista (6 como mucho) llevan nombre de transición. */
+  useEffect(() => {
+    const raiz = lista.current;
+    if (!raiz || typeof IntersectionObserver === "undefined") return;
+    const visibles = new Set<HTMLElement>();
+    const nombrar = () => {
+      raiz.querySelectorAll<HTMLElement>(":scope > li").forEach((li) => {
+        li.style.viewTransitionName = "";
+      });
+      [...visibles].slice(0, 6).forEach((li) => {
+        li.style.viewTransitionName = `producto-${li.dataset.id}`;
+      });
+    };
+    const obs = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        const li = e.target as HTMLElement;
+        if (e.isIntersecting) visibles.add(li);
+        else visibles.delete(li);
+      });
+      nombrar();
+    });
+    raiz.querySelectorAll<HTMLElement>(":scope > li").forEach((li) => obs.observe(li));
+    return () => obs.disconnect();
+  });
+
   const aplicar = (f: () => void) => {
-    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => { skipTransition: () => void } };
     const movil = window.matchMedia("(max-width: 899.98px)").matches;
     const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (movil && !quieto && doc.startViewTransition) doc.startViewTransition(() => flushSync(f));
+    transicion.current?.skipTransition();
+    transicion.current = null;
+    if (movil && !quieto && doc.startViewTransition) transicion.current = doc.startViewTransition(() => flushSync(f));
     else f();
   };
 
@@ -90,7 +120,7 @@ export function Comparador({ productos, afiliado, avisoCreapure, avisoSellos }: 
   const enBorrador = productos.filter((p) => filtra(p, borrador)).length;
 
   const cuadro = (p: ProductoEjemplo) => (
-    <li key={p.id} className="cuadro vista-transicion-cuadro" style={{ viewTransitionName: `producto-${p.id}` }}>
+    <li key={p.id} className="cuadro vista-transicion-cuadro" data-id={p.id}>
       <p className="cuadro-titulo">
         {p.nombre} <span className="marca-ejemplo">[EJEMPLO]</span>
       </p>
@@ -207,7 +237,7 @@ export function Comparador({ productos, afiliado, avisoCreapure, avisoSellos }: 
           <SlidersHorizontal size={16} strokeWidth={1.75} aria-hidden="true" />
           Filtrar{activos ? ` (${activos})` : ""}
         </button>
-        <p className="t-datos" aria-live="polite">
+        <p className="t-datos recuento-productos" aria-live="polite">
           {total} productos
         </p>
       </div>
@@ -272,7 +302,7 @@ export function Comparador({ productos, afiliado, avisoCreapure, avisoSellos }: 
         </div>
       ) : (
         <>
-          <ol className="cuadros-productos mt-8">{conEnvio.map(cuadro)}</ol>
+          <ol ref={lista} className="cuadros-productos mt-8">{conEnvio.map(cuadro)}</ol>
           <table className="tabla tabla-productos mt-8">
             <caption className="sr-only">Creatinas ordenadas por precio por dosis de 3 g con envío</caption>
             {cabeceraTabla(false)}

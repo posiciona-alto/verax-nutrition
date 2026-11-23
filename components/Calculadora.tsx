@@ -7,12 +7,22 @@ import { ArrowRight } from "lucide-react";
 const ATAJOS = [250, 300, 500, 1000];
 const euros = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const fechaLarga = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric" });
+const hoyFormato = "23/11/2026";
 const entero = new Intl.NumberFormat("es-ES", { useGrouping: "always" });
 
-function hoyISO() {
+function hoyTexto() {
   const d = new Date();
   const z = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`;
+  return `${z(d.getDate())}/${z(d.getMonth() + 1)}/${d.getFullYear()}`;
+}
+
+/** Fecha escrita como día/mes/año (23/11/2026); también vale con guiones o puntos. */
+function leerFecha(texto: string): Date | null {
+  const m = texto.trim().match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/);
+  if (!m) return null;
+  const [d, mes, a] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const f = new Date(a, mes - 1, d);
+  return f.getDate() === d && f.getMonth() === mes - 1 ? f : null;
 }
 
 function leerNumero(texto: string): number | null {
@@ -34,7 +44,7 @@ export function Calculadora() {
   const [dosis, setDosis] = useState<3 | 5>(3);
   const [anuncio, setAnuncio] = useState("");
 
-  useEffect(() => setInicio(hoyISO()), []);
+  useEffect(() => setInicio(hoyTexto()), []);
 
   const r = useMemo(() => {
     const g = leerNumero(gramos);
@@ -45,10 +55,10 @@ export function Calculadora() {
     const porDosis = p ? p / (g / dosis) : null;
     let fin: Date | null = null;
     let empieza: Date | null = null;
-    if (inicio) {
-      const [a, m, d] = inicio.split("-").map(Number);
-      empieza = new Date(a, m - 1, d);
-      fin = new Date(a, m - 1, d + dias);
+    const f = leerFecha(inicio);
+    if (f) {
+      empieza = f;
+      fin = new Date(f.getFullYear(), f.getMonth(), f.getDate() + dias);
     }
     return { estado: "ok" as const, g, dias, porDosis, empieza, fin };
   }, [gramos, precio, inicio, dosis]);
@@ -104,7 +114,18 @@ export function Calculadora() {
         </div>
         <div className="campo mt-6">
           <label htmlFor={`${id}-f`}>Empiezas el (opcional)</label>
-          <input id={`${id}-f`} type="date" value={inicio} onChange={(e) => setInicio(e.target.value)} />
+          <input
+            id={`${id}-f`}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            aria-describedby={`${id}-f-ayuda`}
+            value={inicio}
+            onChange={(e) => setInicio(e.target.value)}
+          />
+          <p id={`${id}-f-ayuda`} className="ayuda">
+            Día/mes/año, por ejemplo {hoyFormato}.
+          </p>
         </div>
         <fieldset className="campo mt-6">
           <legend>Dosis para la cuenta</legend>

@@ -5,10 +5,10 @@ import { Cabecera } from "@/components/Cabecera";
 import { Pie } from "@/components/Pie";
 import { Migas, BandaBorrador, Fila } from "@/components/piezas";
 import { NotasMovil } from "@/components/NotasMovil";
-import { SinEllas } from "@/components/SinEllas";
-import { EstilosLlamadas, Llamada, MarcaPago as MarcaPagoSuelta, NotaFrase, NotaFuentes, NotaUno, Numerador, TextoFrase } from "@/components/notas";
+import { SinEllas, type Cambio } from "@/components/SinEllas";
+import { EstilosLlamadas, ListaNotas, Llamada, NotaFrase, NotaFuentes, NotaUno, Numerador, TextoFrase } from "@/components/notas";
 import { formas, resumen, secciones, seguridad, textos, type UsoFrase } from "@/contenido/creatina/ficha";
-import { certezas, MODO_CONCEPTO, notaUno, sitio } from "@/contenido/sitio";
+import { certezas, MODO_CONCEPTO, notaUno, RUTA_CALCULADORA, sitio } from "@/contenido/sitio";
 import { datosEnBorrador, evidenciaCreatina, frase, fuente, paginaLista, vinculosDe } from "@/lib/evidencia";
 
 export const metadata: Metadata = {
@@ -43,9 +43,13 @@ export default function FichaCreatina() {
     sostienen: evaluadas.filter((d) => d.sin_ellas !== "no se sostiene").length,
     sinEvaluar: datos.length - evaluadas.length,
   };
+  /** Dónde cambia algo con «Sin ellas»: las preguntas de seguridad cuyas frases no se sostienen igual. */
+  const cambios: Cambio[] = seguridad
+    .filter((q) => q.frases.some((f) => ["no se sostiene", "se sostiene con menos certeza"].includes(frase(f.n).sin_ellas)))
+    .map((q) => ({ texto: q.pregunta, href: `#${q.id}` }));
   const conBoton = MODO_CONCEPTO || (paginaLista("/creatina/") && recuento.sinEvaluar === 0);
 
-  const capa1 = (lugar: string) => (
+  const capa1 = (lugar: string, boton: boolean) => (
     <div className="capa1" aria-labelledby={`capa1-${lugar}`}>
       <p id={`capa1-${lugar}`} className="font-semibold">
         De dónde sale esto, en 10 segundos
@@ -56,18 +60,18 @@ export default function FichaCreatina() {
         <dt>¿Se sostiene sin ellas?</dt>
         <dd>{textos.seSostiene}</dd>
       </dl>
-      {conBoton ? (
+      {boton && conBoton ? (
         <>
-          <SinEllas articulo={ARTICULO} recuento={recuento} />
+          <SinEllas articulo={ARTICULO} recuento={recuento} cambios={cambios} />
           <p className="t-secundario mt-3">{evidenciaCreatina.texto_junto_al_boton.texto}</p>
         </>
       ) : null}
     </div>
   );
 
-  /** Párrafo con sus llamadas y, al margen, una nota por frase. */
+  /** Párrafo con sus llamadas y, al margen, una nota por frase (la misma si la frase ya salió más arriba). */
   const parrafo = (frases: UsoFrase[], enlace?: { texto: string; href: string }, clave?: string, salud?: boolean) => {
-    const ns = frases.map(() => num.siguiente());
+    const ns = frases.map((f) => num.deFrase(f.n));
     return (
       <Fila
         key={clave}
@@ -75,7 +79,7 @@ export default function FichaCreatina() {
         texto={
           <p>
             {frases.map((f, i) => (
-              <TextoFrase key={i} n={ns[i]} uso={f} />
+              <TextoFrase key={i} n={ns[i].n} primera={ns[i].primera} uso={f} />
             ))}
             {enlace ? (
               <>
@@ -86,7 +90,7 @@ export default function FichaCreatina() {
           </p>
         }
         notas={frases.map((f, i) => (
-          <NotaFrase key={i} n={ns[i]} uso={f} sensibilidad={sens} />
+          <NotaFrase key={i} n={ns[i].n} primera={ns[i].primera} uso={f} sensibilidad={sens} />
         ))}
       />
     );
@@ -98,219 +102,157 @@ export default function FichaCreatina() {
     </h2>
   );
 
-  const contenido = (
-    <>
-      <div className="cabeza-ficha pt-6 md:pt-10">
-        <Migas items={textos.migas} />
-        <Fila
-          className="mt-6"
-          texto={
-            <>
-              <h1 className="t-h1">{textos.h1}</h1>
-              <div className="confianza mt-5">
-                <span>Revisado el {sitio.revisado}</span>
-                <span aria-hidden="true">·</span>
-                <span>Escribe {sitio.autora}</span>
-                <span aria-hidden="true">·</span>
-                <a href="#en-que-se-basa">De dónde sale esto ↓</a>
-                {conBoton ? (
-                  <span className="solo-sin-carril inline-flex items-center gap-2">
-                    <span aria-hidden="true">·</span>
-                    <SinEllas articulo={ARTICULO} recuento={recuento} variante="linea" />
-                  </span>
-                ) : null}
+  const enlacesCompra = (final: boolean) => (
+    <ul className="space-y-3">
+      <li>
+        <Link href="/comparar/creatina/" className="enlace-grande">
+          <span>{final ? textos.ctaFinalP : textos.ctaP}</span>
+          <ArrowRight size={24} strokeWidth={1.5} aria-hidden="true" />
+        </Link>
+      </li>
+      <li>
+        <Link href={RUTA_CALCULADORA} className="enlace-texto">
+          {textos.ctaS} <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
+        </Link>
+      </li>
+    </ul>
+  );
+
+  const cabeza = (
+    <div className="cabeza-ficha pt-6 md:pt-10">
+      <Migas items={textos.migas} />
+      <Fila
+        className="mt-6"
+        texto={
+          <>
+            <h1 className="t-h1 h1-ficha">{textos.h1}</h1>
+            <div className="confianza mt-5">
+              <span>Revisado el {sitio.revisado}</span>
+              <span aria-hidden="true">·</span>
+              <span>Escribe {sitio.autora}</span>
+              <span aria-hidden="true">·</span>
+              <a href="#en-que-se-basa">De dónde sale esto ↓</a>
+            </div>
+            {conBoton ? (
+              <div className="mt-6">
+                <SinEllas articulo={ARTICULO} recuento={recuento} cambios={cambios} variante="texto" />
               </div>
-            </>
-          }
-          notas={<NotaUno texto={notaUno.ciencia} />}
-        />
-      </div>
+            ) : null}
+          </>
+        }
+        notas={<NotaUno texto={notaUno.ciencia} />}
+      />
+    </div>
+  );
 
-      <article id={ARTICULO} className="cuerpo" data-sin-ellas="no">
-        <p id={`${ARTICULO}-aviso`} className="sr-only" aria-live="polite" />
-
-        <section aria-labelledby="en-resumen" className="seccion-cerca">
-          {h2("en-resumen", "En resumen")}
-          <div className="space-y-8">
-            {resumen.map((r) => {
-              const ns = r.frases.map(() => num.siguiente());
-              return (
-                <Fila
-                  key={r.titulo}
-                  className="resumen-item"
-                  texto={
-                    <div>
-                      <h3 className="t-h3">{r.titulo}</h3>
-                      {r.frases.map((f, i) => (
-                        <p key={i} className="mt-2">
-                          <span className="certeza-linea block">{f.certeza}</span>
-                          <TextoFrase n={ns[i]} uso={f} />
-                        </p>
-                      ))}
-                      {r.enlace ? (
-                        <p className="mt-1">
-                          <Link href={r.enlace.href}>{r.enlace.texto}</Link>
-                        </p>
-                      ) : null}
-                    </div>
-                  }
-                  notas={r.frases.map((f, i) => (
-                    <NotaFrase key={i} n={ns[i]} uso={f} sensibilidad={sens} />
+  const resumenBloque = (
+    <section aria-labelledby="en-resumen" className="seccion-cerca">
+      {h2("en-resumen", "En resumen")}
+      <div className="space-y-8">
+        {resumen.map((r) => {
+          const ns = r.frases.map((f) => num.deFrase(f.n));
+          return (
+            <Fila
+              key={r.titulo}
+              className="resumen-item"
+              texto={
+                <div>
+                  <h3 className="t-h3">{r.titulo}</h3>
+                  {r.frases.map((f, i) => (
+                    <p key={i} className="mt-2">
+                      <span className="certeza-linea block">{f.certeza}</span>
+                      <TextoFrase n={ns[i].n} primera={ns[i].primera} uso={f} />
+                    </p>
                   ))}
-                />
-              );
-            })}
-          </div>
-          <Fila
-            className="mt-12"
-            texto={
-              <ul className="space-y-3">
-                <li>
-                  <Link href="/comparar/creatina/" className="enlace-grande">
-                    <span>{textos.ctaP}</span>
-                    <ArrowRight size={24} strokeWidth={1.5} aria-hidden="true" />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/calculadoras/creatina/" className="enlace-texto">
-                    {textos.ctaS} <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
-                  </Link>
-                </li>
-              </ul>
-            }
-          />
-        </section>
-
-        <nav className="indice indice-en-linea seccion-cerca" aria-label="En esta página">
-          <details>
-            <summary className="capa2">
-              <span className="font-semibold" style={{ color: "var(--granate)" }}>
-                Ver el índice
-              </span>
-            </summary>
-            <Indice />
-          </details>
-        </nav>
-
-        {secciones.map((s) => (
-          <section key={s.id} aria-labelledby={s.id} className="seccion-cerca">
-            {h2(s.id, s.titulo)}
-            {s.pendiente ? <p className="pendiente mb-4">{s.pendiente}</p> : null}
-            <div className="space-y-6">{s.parrafos.map((p, i) => parrafo(p.frases, p.enlace, `${s.id}-${i}`))}</div>
-          </section>
-        ))}
-
-        <section aria-labelledby="seguridad" className="seccion-cerca salud">
-          {h2("seguridad", "Efectos secundarios y seguridad")}
-          <div>
-            {seguridad.map((q) =>
-              q.abierta ? (
-                <div key={q.id} className="pregunta">
-                  <h3 id={q.id} className="t-h3 py-4">
-                    {q.pregunta}
-                  </h3>
-                  {parrafo(q.frases, undefined, q.id, true)}
+                  {r.enlace ? (
+                    <p className="mt-1">
+                      <Link href={r.enlace.href}>{r.enlace.texto}</Link>
+                    </p>
+                  ) : null}
                 </div>
-              ) : (
-                <details key={q.id} className="pregunta" id={q.id}>
-                  <summary>
-                    <h3 className="t-h3">{q.pregunta}</h3>
-                    <span className="signo signo-abrir" aria-hidden="true">+</span>
-                    <span className="signo signo-cerrar" aria-hidden="true">−</span>
-                  </summary>
-                  {parrafo(q.frases, undefined, q.id, true)}
-                </details>
-              ),
-            )}
-          </div>
-        </section>
+              }
+              notas={r.frases.map((f, i) => (
+                <NotaFrase key={i} n={ns[i].n} primera={ns[i].primera} uso={f} sensibilidad={sens} />
+              ))}
+            />
+          );
+        })}
+      </div>
+      <Fila className="mt-12" texto={enlacesCompra(false)} />
+    </section>
+  );
 
-        <section aria-labelledby={formas.id} className="seccion-cerca">
-          {h2(formas.id, formas.titulo)}
-          <div className="space-y-6">{formas.parrafos.map((p, i) => parrafo(p.frases, p.enlace, `f-${i}`))}</div>
-          <Fila
-            className="mt-8"
-            texto={
-              <Link href="/comparar/creatina/" className="enlace-grande">
-                <span>{textos.ctaP}</span>
-                <ArrowRight size={24} strokeWidth={1.5} aria-hidden="true" />
-              </Link>
-            }
-          />
-        </section>
+  const cuerpo = secciones.map((s) => (
+    <section key={s.id} aria-labelledby={s.id} className="seccion-cerca">
+      {h2(s.id, s.titulo)}
+      {s.pendiente ? <p className="pendiente mb-4">{s.pendiente}</p> : null}
+      <div className="space-y-6">{s.parrafos.map((p, i) => parrafo(p.frases, p.enlace, `${s.id}-${i}`))}</div>
+    </section>
+  ));
 
-        <DosCosas num={num} />
+  const seguridadBloque = (
+    <section aria-labelledby="seguridad" className="seccion-cerca salud">
+      {h2("seguridad", "Efectos secundarios y seguridad")}
+      <div>
+        {seguridad.map((q) =>
+          q.abierta ? (
+            <div key={q.id} className="pregunta">
+              <h3 id={q.id} className="t-h3 py-4">
+                {q.pregunta}
+              </h3>
+              {parrafo(q.frases, undefined, q.id, true)}
+            </div>
+          ) : (
+            <details key={q.id} className="pregunta" id={q.id}>
+              <summary>
+                <h3 className="t-h3">{q.pregunta}</h3>
+                <span className="signo signo-abrir" aria-hidden="true">
+                  +
+                </span>
+                <span className="signo signo-cerrar" aria-hidden="true">
+                  −
+                </span>
+              </summary>
+              {parrafo(q.frases, undefined, q.id, true)}
+            </details>
+          ),
+        )}
+      </div>
+    </section>
+  );
 
-        <section aria-labelledby="quien-pago" className="seccion-cerca">
-          {h2("quien-pago", "Quién pagó los estudios de la creatina")}
-          {(() => {
-            const n = num.siguiente();
-            return (
-              <Fila
-                texto={
-                  <p>
-                    {evidenciaCreatina.linea_6bis}
-                    <Llamada n={n} /> <Link href="/quien-pago-el-estudio/">Más casos: Quién pagó el estudio&nbsp;→</Link>
-                  </p>
-                }
-                notas={<NotaFuentes n={n} ids={["O6", "O7", "E7"]} />}
-              />
-            );
-          })()}
-        </section>
+  const formasBloque = (
+    <section aria-labelledby={formas.id} className="seccion-cerca">
+      {h2(formas.id, formas.titulo)}
+      <div className="space-y-6">{formas.parrafos.map((p, i) => parrafo(p.frases, p.enlace, `f-${i}`))}</div>
+      <Fila
+        className="mt-8"
+        texto={
+          <Link href="/comparar/creatina/" className="enlace-grande">
+            <span>{textos.ctaP}</span>
+            <ArrowRight size={24} strokeWidth={1.5} aria-hidden="true" />
+          </Link>
+        }
+      />
+    </section>
+  );
 
-        <section className="seccion-cerca" aria-label="Comparar y calcular">
-          <Fila
-            texto={
-              <ul className="space-y-3">
-                <li>
-                  <Link href="/comparar/creatina/" className="enlace-grande">
-                    <span>{textos.ctaFinalP}</span>
-                    <ArrowRight size={24} strokeWidth={1.5} aria-hidden="true" />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/calculadoras/creatina/" className="enlace-texto">
-                    {textos.ctaS} <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
-                  </Link>
-                </li>
-              </ul>
-            }
-          />
-        </section>
+  const nivelBloque = dosCosas(num);
 
-        <section aria-labelledby="en-que-se-basa" className="seccion">
-          {h2("en-que-se-basa", "En qué se basa este artículo")}
-          <Fila
-            texto={capa1("final")}
-            notas={
-              <div className="t-nota">
-                <p className="font-semibold">Qué quiere decir cada certeza</p>
-                <dl className="mt-2 space-y-2">
-                  {Object.entries(certezas).map(([c, d]) => (
-                    <div key={c}>
-                      <dt className="font-semibold">{c}</dt>
-                      <dd>{d}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            }
-          />
-          <details className="capa2 mt-10" open>
-            <summary>Ver todas las fuentes</summary>
-            <ListaFuentes ids={idsFuentes} />
-          </details>
-          <div className="t-nota mt-8 space-y-1">
-            <p>{textos.proximaRevision}</p>
-            <p>
-              <Link href="/como-investigamos/">Cómo investigamos&nbsp;→</Link>
-            </p>
-            <p className="t-secundario">{textos.sanitaria}</p>
-          </div>
-        </section>
-      </article>
-    </>
+  const nPago = num.deFuentes(["O6", "O7"]).n;
+  const quienPago = (
+    <section aria-labelledby="quien-pago" className="seccion-cerca">
+      {h2("quien-pago", "Quién pagó los estudios de la creatina")}
+      <Fila
+        texto={
+          <p>
+            {evidenciaCreatina.linea_6bis}
+            <Llamada n={nPago} /> <Link href="/quien-pago-el-estudio/">Más casos: Quién pagó el estudio&nbsp;→</Link>
+          </p>
+        }
+        notas={<NotaFuentes n={nPago} ids={["O6", "O7"]} />}
+      />
+    </section>
   );
 
   return (
@@ -319,14 +261,62 @@ export default function FichaCreatina() {
       <Cabecera actual="/#suplementos" />
       <main id="contenido" className="con-notas">
         <div className="ficha">
-          <aside className="carril" aria-label="Índice y de dónde sale esto">
-            {capa1("carril")}
+          <aside className="carril" aria-label="De dónde sale esto e índice">
+            {capa1("carril", true)}
             <nav className="indice mt-8" aria-label="En esta página">
               <p className="indice-titulo">En esta página</p>
               <Indice />
             </nav>
           </aside>
-          {contenido}
+          {cabeza}
+          <article id={ARTICULO} className="cuerpo" data-sin-ellas="no">
+            <p id={`${ARTICULO}-aviso`} className="sr-only" aria-live="polite" />
+            {resumenBloque}
+            <nav className="indice indice-en-linea seccion-cerca" aria-label="En esta página">
+              <details>
+                <summary className="capa2">Ver el índice</summary>
+                <Indice />
+              </details>
+            </nav>
+            {cuerpo}
+            {seguridadBloque}
+            {formasBloque}
+            {nivelBloque}
+            {quienPago}
+            <section className="seccion-cerca" aria-label="Comparar y calcular">
+              <Fila texto={enlacesCompra(true)} />
+            </section>
+            <section aria-labelledby="en-que-se-basa" className="seccion">
+              {h2("en-que-se-basa", "En qué se basa este artículo")}
+              <Fila
+                texto={capa1("final", false)}
+                notas={
+                  <div className="t-nota">
+                    <p className="font-semibold">Qué quiere decir cada certeza</p>
+                    <dl className="mt-2 space-y-2">
+                      {Object.entries(certezas).map(([c, d]) => (
+                        <div key={c}>
+                          <dt className="font-semibold">{c}</dt>
+                          <dd>{d}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                }
+              />
+              <details className="capa2 mt-12" id="fuentes">
+                <summary>Ver las fuentes de cada nota, con quién las pagó</summary>
+                <ListaNotas registro={num.registro} />
+              </details>
+              <div className="t-nota mt-8 space-y-1">
+                <p>{textos.proximaRevision}</p>
+                <p>
+                  <Link href="/como-investigamos/">Cómo investigamos&nbsp;→</Link>
+                </p>
+                <p className="t-secundario">{textos.sanitaria}</p>
+              </div>
+            </section>
+          </article>
         </div>
         <EstilosLlamadas usados={num.usados} />
       </main>
@@ -382,9 +372,9 @@ function Indice() {
   );
 }
 
-function DosCosas({ num }: { num: Numerador }) {
-  const nNivel = num.siguiente();
-  const nDecl = num.siguiente();
+function dosCosas(num: Numerador) {
+  const nNivel = num.deFuentes(["O5"]).n;
+  const nDecl = num.deFuentes(["O1"]).n;
   const d = evidenciaCreatina.declaracion_autorizada;
   return (
     <section aria-labelledby="nivel" className="seccion-cerca">
@@ -394,9 +384,7 @@ function DosCosas({ num }: { num: Numerador }) {
       <Fila
         texto={
           <div>
-            <p className="pendiente mb-3">
-              [No se publica hasta comprobar la declaración en el registro de la UE y en el Excel de AESAN]
-            </p>
+            <p className="pendiente mb-3">[No se publica hasta comprobar la declaración en el registro de la UE y en el Excel de AESAN]</p>
             <table className="dos-cosas">
               <caption className="t-h3 pb-3">Son dos cosas distintas</caption>
               <tbody>
@@ -431,23 +419,5 @@ function DosCosas({ num }: { num: Numerador }) {
         }
       />
     </section>
-  );
-}
-
-function ListaFuentes({ ids }: { ids: string[] }) {
-  return (
-    <ul className="lista-notas mt-4 t-nota">
-      {ids.map((id) => {
-        const f = fuente(id);
-        return (
-          <li key={id}>
-            <span className="fuente-cita">{f.cita}</span>
-            {f.revista ? <em>, {f.revista}</em> : null} · {f.tipo}
-            <br />
-            <MarcaPagoSuelta id={id} />
-          </li>
-        );
-      })}
-    </ul>
   );
 }

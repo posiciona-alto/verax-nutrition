@@ -2,16 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Recuento = { apartadas: number; sostienen: number; evaluadas: number; sinEvaluar: number };
+export type Recuento = { apartadas: number; sostienen: number; evaluadas: number; sinEvaluar: number };
+export type Cambio = { texto: string; href: string };
 
 const ESTADO = "verax:sin-ellas";
 
 /**
  * El momento estrella «Sin ellas» (movimiento-v1, apartado 2): un botón que cambia un atributo del artículo.
- * El CSS hace el resto. Hay un botón en el carril o en «En qué se basa» y otro en la línea de confianza del móvil:
- * los dos comparten el estado a través de un evento.
+ * El CSS hace el resto. Hay un botón en el carril y otro bajo la línea de confianza; comparten el estado con un evento.
+ * Los dos textos del botón y del recuento están siempre en el HTML, apilados en la misma celda: al cambiar no se mueve nada.
  */
-export function SinEllas({ articulo, recuento, variante = "caja" }: { articulo: string; recuento: Recuento; variante?: "caja" | "linea" }) {
+export function SinEllas({
+  articulo,
+  recuento,
+  cambios,
+  variante = "carril",
+}: {
+  articulo: string;
+  recuento: Recuento;
+  cambios: Cambio[];
+  variante?: "carril" | "texto";
+}) {
   const [activo, setActivo] = useState(false);
   const boton = useRef<HTMLButtonElement>(null);
 
@@ -32,35 +43,47 @@ export function SinEllas({ articulo, recuento, variante = "caja" }: { articulo: 
     const aviso = document.getElementById(`${articulo}-aviso`);
     if (aviso)
       aviso.textContent = nuevo
-        ? `Leyendo sin las ${recuento.apartadas} fuentes que apartamos: se sostienen ${recuento.sostienen} de ${recuento.evaluadas} frases evaluadas.`
+        ? `Sin las ${recuento.apartadas} fuentes con vínculos: se sostienen ${recuento.sostienen} de ${recuento.evaluadas} frases.`
         : "Leyendo con todas las fuentes.";
     window.dispatchEvent(new CustomEvent(ESTADO, { detail: nuevo }));
   };
 
-  if (variante === "linea") {
-    return (
-      <button ref={boton} type="button" className="boton-linea" aria-pressed={activo} onClick={cambiar}>
-        {activo ? "Volver a leer con todas" : "Leer sin ellas"}
-      </button>
-    );
-  }
+  /** Las preguntas de salud van plegadas: el enlace abre la suya antes de saltar. */
+  const abrir = (href: string) => {
+    const destino = document.getElementById(href.slice(1));
+    if (destino instanceof HTMLDetailsElement) destino.open = true;
+  };
 
   return (
-    <div>
+    <div className={`sin-ellas sin-ellas-${variante}`} data-activo={activo ? "si" : "no"}>
       <button ref={boton} type="button" className="boton-sin-ellas" aria-pressed={activo} onClick={cambiar}>
-        <span>{activo ? "Volver a leer con todas" : "Leer sin las fuentes con vínculos"}</span>
+        <span className="pila">
+          <span className="pila-a">Leer sin las fuentes con vínculos</span>
+          <span className="pila-b">Volver a leer con todas</span>
+        </span>
       </button>
-      <p className="mt-3" aria-hidden="true">
-        {activo ? (
-          <>
-            Sin las {recuento.apartadas} fuentes que apartamos: <strong>se sostienen {recuento.sostienen} de {recuento.evaluadas}</strong>{" "}
-            frases evaluadas
+      <div className="recuento pila">
+        <p className="pila-a recuento-reposo">Con todas las fuentes.</p>
+        <div className="pila-b">
+          <p className="recuento-cifra">
+            Sin las {recuento.apartadas} con vínculos: se sostienen {recuento.sostienen} de {recuento.evaluadas} frases
             {recuento.sinEvaluar ? `; ${recuento.sinEvaluar} sin evaluar` : ""}.
-          </>
-        ) : (
-          <>Con todas las fuentes.</>
-        )}
-      </p>
+          </p>
+          {cambios.length ? (
+            <p className="recuento-cambios">
+              Cambian:{" "}
+              {cambios.map((c, i) => (
+                <span key={c.href}>
+                  {i ? " · " : ""}
+                  <a href={c.href} onClick={() => abrir(c.href)}>
+                    {c.texto}&nbsp;↓
+                  </a>
+                </span>
+              ))}
+            </p>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }

@@ -28,6 +28,8 @@ const cabeceras = [
 
 const config: NextConfig = {
   poweredByHeader: false,
+  agentRules: false,
+  devIndicators: false,
   productionBrowserSourceMaps: false,
   trailingSlash: true,
   reactStrictMode: true,

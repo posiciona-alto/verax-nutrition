@@ -1,0 +1,16 @@
+# Posiciona Alto · nunca salen (lo que no esté en git también se queda fuera del despliegue de Vercel)
+CLAUDE.md
+AGENTS.md
+.claude/
+.cursor/
+.cursorrules
+.windsurfrules
+.github/copilot-instructions.md
+prompts/
+notas/
+.notas/
+*.notas.md
+brief*/
+*.brief.md
+.env*
+!.env.example

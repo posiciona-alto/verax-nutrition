@@ -1,0 +1,28 @@
+# Dependencias y compilación
+node_modules/
+.next/
+out/
+build/
+coverage/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+npm-debug.log*
+
+# Posiciona Alto · nunca salen
+CLAUDE.md
+AGENTS.md
+.claude/
+.cursor/
+.cursorrules
+.windsurfrules
+.github/copilot-instructions.md
+prompts/
+notas/
+brief*/
+*.brief.md
+.env*
+!.env.example
+.notas/
+*.notas.md
